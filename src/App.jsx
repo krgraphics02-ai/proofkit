@@ -882,8 +882,7 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab }) {
   const [loading, setLoading] = useState(false);
   const handleSubscribe = () => {
     setLoading(true);
-    // 👉 Branche ici ton lien Stripe : window.location.href = "..."
-    setTimeout(() => { setSubscribed(true); setLoading(false); }, 1500);
+    window.location.href = "https://buy.stripe.com/test_placeholder";
   };
   return (
     <div className="sub-wrap">
