@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { supabase } from './supabase.js';
 
 /* ─── STYLES ─── */
 const makeStyles = (dark) => `
@@ -350,18 +351,32 @@ function LoginForm({ data, onLogin }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const submit = () => {
+  const submit = async () => {
     // Super admin
     if (email === data.superadmin.username && password === data.superadmin.password) {
       onLogin({ type: "superadmin" }); return;
     }
-    // Cherche par email dans tous les restos
-    for (const resto of data.restaurants) {
-      const user = resto.users.find(u => u.email === email.trim() && u.password === password);
-      if (user) { onLogin({ type: "resto", restoId: resto.id, user }); return; }
-      // Compat ancien système username
-      const u2 = resto.users.find(u => u.username === email.trim() && u.password === password);
-      if (u2) { onLogin({ type: "resto", restoId: resto.id, user: u2 }); return; }
+    // Cherche dans Supabase
+    const { data: users } = await supabase
+      .from('users')
+      .select('*, restaurants(*)')
+      .eq('email', email.trim())
+      .eq('password', password)
+      .single();
+
+    if (users) {
+      const resto = users.restaurants;
+      const restoObj = {
+        id: resto.id, name: resto.name, emoji: "🍽️",
+        subscribed: resto.subscribed, users: [], records: [], alerts: []
+      };
+      setData(prev => {
+        const exists = prev.restaurants.find(r => r.id === resto.id);
+        if (exists) return prev;
+        return { ...prev, restaurants: [...prev.restaurants, restoObj] };
+      });
+      onLogin({ type: "resto", restoId: resto.id, user: { id: users.id, email: users.email, name: users.name, role: users.role, username: users.email } });
+      return;
     }
     setError("Email ou mot de passe incorrect.");
   };
@@ -389,24 +404,36 @@ function RegisterForm({ data, setData, onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const submit = () => {
+  const submit = async () => {
     if (!restoName || !managerName || !email || !password) { setError("Tous les champs sont obligatoires."); return; }
     if (password.length < 6) { setError("Le mot de passe doit faire au moins 6 caractères."); return; }
     if (password !== confirm) { setError("Les mots de passe ne correspondent pas."); return; }
-    // Vérifie email unique
-    for (const r of data.restaurants) {
-      if (r.users.find(u => u.email === email.trim())) { setError("Cet email est déjà utilisé."); return; }
-    }
 
     setLoading(true);
-    setTimeout(() => {
-      const id = "r" + Date.now();
-      const user = { id: id + "-u1", email: email.trim(), username: email.trim(), password, name: managerName, role: "manager" };
-      const newResto = { id, name: restoName, emoji, subscribed: false, users: [user], records: [], alerts: [] };
-      setData(prev => ({ ...prev, restaurants: [...prev.restaurants, newResto] }));
-      onLogin({ type: "resto", restoId: id, user });
-      setLoading(false);
-    }, 800);
+
+    // Vérifie email unique dans Supabase
+    const { data: existing } = await supabase.from('users').select('id').eq('email', email.trim()).single();
+    if (existing) { setError("Cet email est déjà utilisé."); setLoading(false); return; }
+
+    // Crée le restaurant
+    const { data: restoData, error: restoError } = await supabase
+      .from('restaurants')
+      .insert([{ name: restoName, email: email.trim(), password, subscribed: false }])
+      .select().single();
+
+    if (restoError) { setError("Erreur lors de la création. Réessaie."); setLoading(false); return; }
+
+    // Crée le manager
+    const { data: userData } = await supabase
+      .from('users')
+      .insert([{ restaurant_id: restoData.id, name: managerName, email: email.trim(), username: email.trim(), password, role: "manager" }])
+      .select().single();
+
+    const user = { id: userData.id, email: email.trim(), username: email.trim(), password, name: managerName, role: "manager" };
+    const newResto = { id: restoData.id, name: restoName, emoji: "🍽️", subscribed: false, users: [user], records: [], alerts: [] };
+    setData(prev => ({ ...prev, restaurants: [...prev.restaurants, newResto] }));
+    onLogin({ type: "resto", restoId: restoData.id, user });
+    setLoading(false);
   };
 
   return (
@@ -882,7 +909,8 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab }) {
   const [loading, setLoading] = useState(false);
   const handleSubscribe = () => {
     setLoading(true);
-    window.location.href = "https://buy.stripe.com/test_placeholder";
+    // 👉 Branche ici ton lien Stripe : window.location.href = "..."
+    setTimeout(() => { setSubscribed(true); setLoading(false); }, 1500);
   };
   return (
     <div className="sub-wrap">
