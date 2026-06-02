@@ -804,7 +804,28 @@ function RecordsView({ records, setRecords, currentUser, dark }) {
               <div className="result-row"><span className="result-row-label">Pris par</span><span className="result-row-value">{selected.author}</span></div>
               {selected.items_detected && <div className="result-row"><span className="result-row-label">Articles</span><span className="result-row-value">{selected.items_detected}</span></div>}
               {selected.anomaly && <div className="result-row"><span className="result-row-label">Anomalie</span><span className="result-row-value" style={{ color: "var(--yellow)" }}>{selected.anomaly}</span></div>}
-              {currentUser.role === "manager" && <button className="modal-del-btn" onClick={() => deleteRecord(selected.id)}>🗑 Supprimer</button>}
+              <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }} onClick={() => {
+  try {
+    const img = selected.imgSrc;
+    const base64 = img.split(",")[1];
+    const dateObj = new Date(selected.timestamp);
+    const pad = n => String(n).padStart(2, '0');
+    const exifDate = `${dateObj.getFullYear()}:${pad(dateObj.getMonth()+1)}:${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
+    const exifObj = { "0th": {}, "Exif": {} };
+    exifObj["0th"][piexif.ImageIFD.DateTime] = exifDate;
+    exifObj["Exif"][piexif.ExifIFD.DateTimeOriginal] = exifDate;
+    exifObj["Exif"][piexif.ExifIFD.DateTimeDigitized] = exifDate;
+    const exifStr = piexif.dump(exifObj);
+    const newBase64 = piexif.insert(exifStr, "data:image/jpeg;base64," + base64);
+    const link = document.createElement("a");
+    link.href = newBase64;
+    link.download = `commande-${selected.order_number || "inconnu"}-${dateObj.getFullYear()}${pad(dateObj.getMonth()+1)}${pad(dateObj.getDate())}.jpg`;
+    link.click();
+  } catch(e) {
+    alert("Erreur lors du téléchargement : " + e.message);
+  }
+}}>📥 Télécharger la preuve</button>
+{currentUser.role === "manager" && <button className="modal-del-btn" onClick={() => deleteRecord(selected.id)}>🗑 Supprimer</button>}
             </div>
           </div>
         </div>
