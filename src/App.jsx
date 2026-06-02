@@ -336,7 +336,7 @@ function LoginScreen({ data, setData, onLogin, dark, setDark }) {
           </div>
 
           {mode === "login"
-            ? <LoginForm data={data} onLogin={onLogin} />
+            ? <LoginForm data={data} setData={setData} onLogin={onLogin} />
             : <RegisterForm data={data} setData={setData} onLogin={onLogin} />
           }
         </div>
@@ -346,7 +346,7 @@ function LoginScreen({ data, setData, onLogin, dark, setDark }) {
 }
 
 /* ─── LOGIN FORM ─── */
-function LoginForm({ data, onLogin }) {
+function LoginForm({ data, setData, onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
