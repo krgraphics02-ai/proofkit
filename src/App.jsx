@@ -412,7 +412,7 @@ function RegisterForm({ data, setData, onLogin }) {
     setLoading(true);
 
     // Vérifie email unique dans Supabase
-    const { data: existing } = await supabase.from('users').select('id').eq('email', email.trim()).single();
+    const { data: existing } = await supabase.from('users').select('id').eq('email', email.trim()).maybeSingle();
     if (existing) { setError("Cet email est déjà utilisé."); setLoading(false); return; }
 
     // Crée le restaurant
