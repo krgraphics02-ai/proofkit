@@ -636,7 +636,13 @@ function CaptureView({ currentUser, addRecord, subscribed, setActiveTab }) {
     r.readAsDataURL(file);
   };
 
-  const toBase64 = (file) => new Promise((res, rej) => {
+const toBase64 = (file) => new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(",")[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+
 const fixExifDate = (base64Img, timestamp) => {
   try {
     const dateObj = new Date(timestamp);
@@ -652,11 +658,6 @@ const fixExifDate = (base64Img, timestamp) => {
     return base64Img;
   }
 };
-    const r = new FileReader();
-    r.onload = () => res(r.result.split(",")[1]);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
 
   const handleSubmit = async () => {
     if (!imgFile) return;
