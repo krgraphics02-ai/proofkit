@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from './supabase.js';
+import piexif from 'piexifjs';
 
 /* ─── STYLES ─── */
 const makeStyles = (dark) => `
@@ -636,6 +637,21 @@ function CaptureView({ currentUser, addRecord, subscribed, setActiveTab }) {
   };
 
   const toBase64 = (file) => new Promise((res, rej) => {
+const fixExifDate = (base64Img, timestamp) => {
+  try {
+    const dateObj = new Date(timestamp);
+    const pad = n => String(n).padStart(2, '0');
+    const exifDate = `${dateObj.getFullYear()}:${pad(dateObj.getMonth()+1)}:${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
+    const exifObj = { "0th": {}, "Exif": {} };
+    exifObj["0th"][piexif.ImageIFD.DateTime] = exifDate;
+    exifObj["Exif"][piexif.ExifIFD.DateTimeOriginal] = exifDate;
+    exifObj["Exif"][piexif.ExifIFD.DateTimeDigitized] = exifDate;
+    const exifStr = piexif.dump(exifObj);
+    return piexif.insert(exifStr, base64Img);
+  } catch {
+    return base64Img;
+  }
+};
     const r = new FileReader();
     r.onload = () => res(r.result.split(",")[1]);
     r.onerror = rej;
@@ -675,7 +691,8 @@ Le numéro est souvent court (4-6 caractères) et alphanumérique.` }
       const data = await res.json();
       const text = data.content?.map(b => b.text || "").join("") || "{}";
       const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
-      record = { ...parsed, timestamp, imgSrc };
+      const fixedImg = fixExifDate(imgSrc, timestamp);
+record = { ...parsed, timestamp, imgSrc: fixedImg };
     } catch {
       record = { order_number: null, status: "warning", anomaly: "Analyse impossible.", items_detected: null, confidence: "low", timestamp, imgSrc };
     }
