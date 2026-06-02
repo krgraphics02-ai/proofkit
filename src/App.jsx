@@ -657,8 +657,18 @@ function CaptureView({ currentUser, addRecord, subscribed, setActiveTab }) {
           max_tokens: 1000,
           messages: [{ role: "user", content: [
             { type: "image", source: { type: "base64", media_type: imgFile.type || "image/jpeg", data: b64 } },
-            { type: "text", text: `Tu es un système d'analyse de commandes restaurant. Analyse cette photo et réponds UNIQUEMENT en JSON valide sans markdown :
-{"order_number":"numéro de commande visible ou null","status":"ok|warning|alert","anomaly":"description anomalie ou null","items_detected":"articles visibles","confidence":"high|medium|low"}` }
+            { type: "text", text: `Tu es un système d'analyse de commandes restaurant de livraison (Uber Eats, Deliveroo, Just Eat, etc).
+
+Analyse cette photo de ticket et réponds UNIQUEMENT en JSON valide sans markdown :
+{"order_number":"numéro de commande","status":"ok|warning|alert","anomaly":"description anomalie ou null","items_detected":"liste des articles visibles","confidence":"high|medium|low"}
+
+Pour trouver le numéro de commande, cherche :
+- Un code alphanumérique court comme #9E273, #255D5, 9EE80
+- "Uber Eats #XXXXX" en haut du ticket
+- "Order # XXXXXX"
+- Un code en gros caractères en haut
+- "INTERNAL ID #XXXXX"
+Le numéro est souvent court (4-6 caractères) et alphanumérique.` }
           ]}]
         })
       });
