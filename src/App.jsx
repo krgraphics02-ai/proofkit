@@ -679,13 +679,13 @@ const fixExifDate = (base64Img, timestamp) => {
 Analyse cette photo de ticket et réponds UNIQUEMENT en JSON valide sans markdown :
 {"order_number":"numéro de commande","status":"ok|warning|alert","anomaly":"description anomalie ou null","items_detected":"liste des articles visibles","confidence":"high|medium|low"}
 
-Pour trouver le numéro de commande, cherche :
-- Un code alphanumérique court comme #9E273, #255D5, 9EE80
-- "Uber Eats #XXXXX" en haut du ticket
-- "Order # XXXXXX"
-- Un code en gros caractères en haut
-- "INTERNAL ID #XXXXX"
-Le numéro est souvent court (4-6 caractères) et alphanumérique.` }
+PRIORITÉ ABSOLUE — trouve le numéro de commande :
+- Sur Uber Eats français : code 5 caractères en GROS dans un rectangle noir en haut (ex: DD31E, 9EE80, AB12C)
+- Avec un # devant en gros caractères (ex: #255D5, #9E273) — retourne le numéro SANS le #, donc "255D5" et non "#255D5"
+- "Order # XXXXXX" ou "Uber Eats #XXXXX"
+- Code alphanumérique court en évidence en haut du ticket
+- Lis attentivement même si la photo est de travers ou froissée
+Si tu vois un code en gros caractères en haut, c'est FORCÉMENT le numéro de commande.` }
           ]}]
         })
       });
