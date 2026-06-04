@@ -959,7 +959,7 @@ const deleteRecord = async (id) => {
   } catch(e) {
     alert("Erreur : " + e.message);
   }
-}}📥 Télécharger la preuve</button>
+}}>📥 Télécharger la preuve</button>
 {currentUser.role === "manager" && <button className="modal-del-btn" onClick={() => deleteRecord(selected.id)}>🗑 Supprimer</button>}
             </div>
           </div>
