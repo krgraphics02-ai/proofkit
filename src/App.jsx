@@ -1068,7 +1068,6 @@ function AdminView({ users, setUsers, records, restoId, subscribed }) {
               <div className="user-login">@{u.username}</div>
             </div>
             {u.role !== "manager" && <button className="del-btn" onClick={async () => {
-console.log("Deleting user:", u.id);
 await supabase.from('users').delete().eq('id', u.id);
   setUsers(prev => prev.filter(x => x.id !== u.id));
 }}>Supprimer</button>}
