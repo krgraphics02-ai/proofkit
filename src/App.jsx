@@ -968,7 +968,6 @@ const deleteRecord = async (id) => {
   }
 }}
 link.download = `commande-${selected.order_number || "inconnu"}-${new Date(selected.timestamp).toISOString().slice(0,10)}.jpg`;
-link.target = "_blank";
 link.click();
 if (selected.img_src_2) {
   const link2 = document.createElement("a");
