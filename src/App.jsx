@@ -250,26 +250,8 @@ const makeStyles = (dark) => `
 /* ─── DATA INITIALE ─── */
 const INIT_DATA = {
   superadmin: { username: "superadmin", password: "admin123" },
-  restaurants: [
-    {
-      id: "r1", name: "Le Bistrot du Coin", emoji: "🍷", subscribed: true,
-      users: [
-        { id: "r1-u1", username: "patron1", password: "patron123", name: "Marc", role: "manager" },
-        { id: "r1-u2", username: "alice", password: "alice123", name: "Alice", role: "employee" },
-      ],
-      records: [], alerts: []
-    },
-    {
-      id: "r2", name: "Pizza Napoli", emoji: "🍕", subscribed: false,
-      users: [
-        { id: "r2-u1", username: "patron2", password: "patron123", name: "Sofia", role: "manager" },
-        { id: "r2-u2", username: "karim", password: "karim123", name: "Karim", role: "employee" },
-      ],
-      records: [], alerts: []
-    }
-  ]
+  restaurants: []
 };
-
 const fmtDate = (iso) => {
   const d = new Date(iso);
   return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
