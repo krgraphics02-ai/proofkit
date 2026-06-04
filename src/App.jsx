@@ -936,10 +936,36 @@ const deleteRecord = async (id) => {
               <div className="result-row"><span className="result-row-label">Pris par</span><span className="result-row-value">{selected.author}</span></div>
               {selected.items_detected && <div className="result-row"><span className="result-row-label">Articles</span><span className="result-row-value">{selected.items_detected}</span></div>}
               {selected.anomaly && <div className="result-row"><span className="result-row-label">Anomalie</span><span className="result-row-value" style={{ color: "var(--yellow)" }}>{selected.anomaly}</span></div>}
-              <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }} onClick={() => {
+              <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }} onClick={async () => {
   try {
-const link = document.createElement("a");
-link.href = selected.imgSrc;
+    const downloadAndStamp = async (url, filename) => {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      const reader = new FileReader();
+      const base64 = await new Promise(res => { reader.onload = () => res(reader.result); reader.readAsDataURL(blob); });
+      const dateObj = new Date(selected.timestamp);
+      const pad = n => String(n).padStart(2, '0');
+      const exifDate = `${dateObj.getFullYear()}:${pad(dateObj.getMonth()+1)}:${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
+      const exifObj = { "0th": {}, "Exif": {} };
+      exifObj["0th"][piexif.ImageIFD.DateTime] = exifDate;
+      exifObj["Exif"][piexif.ExifIFD.DateTimeOriginal] = exifDate;
+      exifObj["Exif"][piexif.ExifIFD.DateTimeDigitized] = exifDate;
+      const exifStr = piexif.dump(exifObj);
+      const stamped = piexif.insert(exifStr, base64.startsWith("data:image/jpeg") ? base64 : base64.replace("data:image/", "data:image/jpeg;").split(";base64,")[0] + ";base64," + base64.split(";base64,")[1]);
+      const link = document.createElement("a");
+      link.href = stamped;
+      link.download = filename;
+      link.click();
+    };
+    const dateObj = new Date(selected.timestamp);
+    const pad = n => String(n).padStart(2, '0');
+    const dateName = `${dateObj.getFullYear()}${pad(dateObj.getMonth()+1)}${pad(dateObj.getDate())}-${pad(dateObj.getHours())}h${pad(dateObj.getMinutes())}`;
+    await downloadAndStamp(selected.imgSrc, `commande-${selected.order_number || "inconnu"}-${dateName}.jpg`);
+    if (selected.img_src_2) await downloadAndStamp(selected.img_src_2, `commande-${selected.order_number || "inconnu"}-${dateName}-2.jpg`);
+  } catch(e) {
+    alert("Erreur lors du téléchargement : " + e.message);
+  }
+}}
 link.download = `commande-${selected.order_number || "inconnu"}-${new Date(selected.timestamp).toISOString().slice(0,10)}.jpg`;
 link.target = "_blank";
 link.click();
