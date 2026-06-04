@@ -939,7 +939,7 @@ const deleteRecord = async (id) => {
               <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }} onClick={async () => {
   try {
     const downloadAndStamp = async (url, filename) => {
-      const response = await fetch(url);
+      const response = await fetch(`/api/download?url=${encodeURIComponent(url)}`);
       const blob = await response.blob();
       const reader = new FileReader();
       const base64 = await new Promise(res => { reader.onload = () => res(reader.result); reader.readAsDataURL(blob); });
