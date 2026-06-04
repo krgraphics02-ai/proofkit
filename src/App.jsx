@@ -815,7 +815,7 @@ record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
   timestamp: record.timestamp
 }]);
 addRecord(record);
-setDailyCount(prev => prev + 1);
+if (!subscribed) setDailyCount(prev => prev + 1);
     setLoading(false); setDone(true);
     setTimeout(() => { setActiveTab("Preuves"); setImgSrc(null); setImgFile(null); setDone(false); }, 1200);
   };
