@@ -463,6 +463,19 @@ function RegisterForm({ data, setData, onLogin }) {
 /* ─── SUPER ADMIN PANEL ─── */
 function SuperAdminPanel({ data, setData, onLogout, dark, setDark }) {
   const [tab, setTab] = useState("restos");
+useEffect(() => {
+  const loadRestos = async () => {
+    const { data: restos } = await supabase.from('restaurants').select('*');
+    if (restos) {
+      const formatted = restos.map(r => ({
+        id: r.id, name: r.name, emoji: "🍽️",
+        subscribed: r.subscribed, users: [], records: [], alerts: []
+      }));
+      setData(prev => ({ ...prev, restaurants: formatted }));
+    }
+  };
+  loadRestos();
+}, []);
   const [newName, setNewName] = useState("");
   const [newEmoji, setNewEmoji] = useState("🍽️");
   const [newUser, setNewUser] = useState("");
