@@ -675,7 +675,7 @@ const fixExifDate = (base64Img, timestamp) => {
   "anthropic-dangerous-direct-browser-access": "true",
 },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: "claude-haiku-4-5-20251001",
           max_tokens: 1000,
           messages: [{ role: "user", content: [
             { type: "image", source: { type: "base64", media_type: imgFile.type || "image/jpeg", data: b64 } },
