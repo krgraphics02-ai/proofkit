@@ -1077,8 +1077,7 @@ function AdminView({ users, setUsers, records, restoId, subscribed }) {
             </div>
             {u.role !== "manager" && <button className="del-btn" onClick={async () => {
 console.log("Deleting user:", u.id);
-const { data: delData, error: delError } = await supabase.from('users').delete().eq('id', u.id).select();
-alert('Deleted: ' + JSON.stringify(delData) + ' Error: ' + JSON.stringify(delError) + ' ID: ' + u.id);
+await supabase.from('users').delete().eq('id', u.id);
   setUsers(prev => prev.filter(x => x.id !== u.id));
 }}>Supprimer</button>}
           </div>
