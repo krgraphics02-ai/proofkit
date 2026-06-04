@@ -942,7 +942,7 @@ const deleteRecord = async (id) => {
               <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }}onClick={async () => {
   try {
     const dl = async (url, filename) => {
-      const res = await fetch(`/api/download?url=${encodeURIComponent(url)}`);
+      const res = await fetch(`/api/download?url=${encodeURIComponent(url)}&timestamp=${encodeURIComponent(selected.timestamp)}`);
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
