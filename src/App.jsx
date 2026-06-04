@@ -956,7 +956,9 @@ const deleteRecord = async (id) => {
       const link = document.createElement("a");
       link.href = stamped;
       link.download = filename;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
     };
     const dateObj = new Date(selected.timestamp);
     const pad = n => String(n).padStart(2, '0');
