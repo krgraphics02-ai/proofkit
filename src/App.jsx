@@ -674,7 +674,12 @@ const fixExifDate = (base64Img, timestamp) => {
     const timestamp = new Date().toISOString();
     let record;
     try {
-const uploadedUrl = await uploadToSupabase(imgFile, timestamp);
+let uploadedUrl = null;
+try {
+  uploadedUrl = await uploadToSupabase(imgFile, timestamp);
+} catch(e) {
+  console.error("Upload error:", e);
+}
       const b64 = await toBase64(imgFile);
       const res = await fetch("/api/analyze", {
         method: "POST",
