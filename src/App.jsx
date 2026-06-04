@@ -953,12 +953,21 @@ const deleteRecord = async (id) => {
       exifObj["Exif"][piexif.ExifIFD.DateTimeDigitized] = exifDate;
       const exifStr = piexif.dump(exifObj);
       const stamped = piexif.insert(exifStr, jpegBase64);
+      const base64Data = stamped.split(",")[1];
+      const byteCharacters = atob(base64Data);
+      const byteArray = new Uint8Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteArray[i] = byteCharacters.charCodeAt(i);
+      }
+      const blob = new Blob([byteArray], { type: "image/jpeg" });
+      const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = stamped;
+      link.href = blobUrl;
       link.download = filename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
     };
     const dateObj = new Date(selected.timestamp);
     const pad = n => String(n).padStart(2, '0');
