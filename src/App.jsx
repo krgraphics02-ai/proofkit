@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from './supabase.js';
 import piexif from 'piexifjs';
 
@@ -565,6 +565,25 @@ function RestoApp({ resto, user, updateResto, onLogout, dark, setDark }) {
     ? ["Capturer", "Preuves", "Alertes", "Équipe", "Admin", "Abonnement"]
     : ["Capturer", "Preuves", "Alertes"];
   const [activeTab, setActiveTab] = useState("Capturer");
+useEffect(() => {
+  const loadRecords = async () => {
+    const { data } = await supabase
+      .from('records')
+      .select('*')
+      .eq('restaurant_id', user.id)
+      .order('timestamp', { ascending: false });
+    if (data && data.length > 0) {
+      const formatted = data.map(r => ({
+        ...r,
+        imgSrc: r.img_src,
+        authorId: r.author_id,
+        id: r.id
+      }));
+      updateResto(r => ({ ...r, records: formatted }));
+    }
+  };
+  loadRecords();
+}, []);
   const unseenAlerts = resto.alerts.filter(a => !a.seenBy.includes(user.id));
 
   const addRecord = (record) => {
