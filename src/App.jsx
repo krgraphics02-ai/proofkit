@@ -502,7 +502,12 @@ useEffect(() => {
     restaurants: prev.restaurants.map(r => r.id === id ? { ...r, subscribed: !r.subscribed } : r)
   }));
 
-  const deleteResto = (id) => setData(prev => ({ ...prev, restaurants: prev.restaurants.filter(r => r.id !== id) }));
+const deleteResto = async (id) => {
+  await supabase.from('records').delete().eq('restaurant_id', id);
+  await supabase.from('users').delete().eq('restaurant_id', id);
+  await supabase.from('restaurants').delete().eq('id', id);
+  setData(prev => ({ ...prev, restaurants: prev.restaurants.filter(r => r.id !== id) }));
+};
 
   return (
     <>
