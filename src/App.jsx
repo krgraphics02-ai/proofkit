@@ -645,6 +645,22 @@ const uploadToSupabase = async (file, timestamp) => {
   const { data: urlData } = supabase.storage.from('proofs').getPublicUrl(fileName);
   return urlData.publicUrl;
 };
+const compressImage = (file) => new Promise((resolve) => {
+  const canvas = document.createElement('canvas');
+  const img = new Image();
+  img.onload = () => {
+    const maxSize = 1024;
+    let w = img.width, h = img.height;
+    if (w > maxSize || h > maxSize) {
+      if (w > h) { h = h * maxSize / w; w = maxSize; }
+      else { w = w * maxSize / h; h = maxSize; }
+    }
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    canvas.toBlob(blob => resolve(new File([blob], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.7);
+  };
+  img.src = URL.createObjectURL(file);
+});
 const toBase64 = (file) => new Promise((res, rej) => {
     const r = new FileReader();
     r.onload = () => res(r.result.split(",")[1]);
@@ -680,7 +696,8 @@ try {
 } catch(e) {
   console.error("Upload error:", e);
 }
-      const b64 = await toBase64(imgFile);
+      const compressed = await compressImage(imgFile);
+const b64 = await toBase64(compressed);
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { 
