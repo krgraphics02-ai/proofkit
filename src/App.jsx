@@ -695,7 +695,7 @@ Si tu vois un code en gros caractères en haut, c'est FORCÉMENT le numéro de c
       const fixedImg = fixExifDate(imgSrc, timestamp);
 record = { ...parsed, timestamp, imgSrc: fixedImg };
     } catch {
-      record = { order_number: null, status: "warning", anomaly: "Analyse impossible.", items_detected: null, confidence: "low", timestamp, imgSrc };
+      record = { order_number: null, status: "warning", anomaly: "Erreur: " + e.message, items_detected: null, confidence: "low", timestamp, imgSrc };
     }
     addRecord(record);
     setLoading(false); setDone(true);
