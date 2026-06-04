@@ -600,6 +600,8 @@ useEffect(() => {
         id: r.id
       }));
       updateResto(r => ({ ...r, records: formatted }));
+const { data: usersData } = await supabase.from('users').select('*').eq('restaurant_id', resto.id);
+if (usersData) updateResto(r => ({ ...r, users: usersData }));
     }
   };
   loadRecords();
