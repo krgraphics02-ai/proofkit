@@ -734,7 +734,19 @@ record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
     } catch {
       record = { order_number: null, status: "warning", anomaly: "Erreur: " + e.message, items_detected: null, confidence: "low", timestamp, imgSrc };
     }
-    addRecord(record);
+    await supabase.from('records').insert([{
+  restaurant_id: currentUser.id,
+  author: currentUser.name,
+  author_id: currentUser.id,
+  order_number: record.order_number,
+  status: record.status,
+  anomaly: record.anomaly,
+  items_detected: record.items_detected,
+  confidence: record.confidence,
+  img_src: record.imgSrc,
+  timestamp: record.timestamp
+}]);
+addRecord(record);
     setLoading(false); setDone(true);
     setTimeout(() => { setActiveTab("Preuves"); setImgSrc(null); setImgFile(null); setDone(false); }, 1200);
   };
