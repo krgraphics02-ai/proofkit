@@ -654,7 +654,7 @@ subscribed={resto.subscribed} setActiveTab={setActiveTab} />}
           {activeTab === "Preuves" && <RecordsView records={resto.records} setRecords={setRecords} currentUser={user} dark={dark} />}
           {activeTab === "Alertes" && <AlertsView alerts={resto.alerts} dismissAlert={dismissAlert} currentUser={user} />}
           {activeTab === "Équipe" && user.role === "manager" && <TeamView users={resto.users} records={resto.records} />}
-         {activeTab === "Admin" && user.role === "manager" && <AdminView users={resto.users} setUsers={setUsers} records={resto.records} restoId={resto.id} />}
+         {activeTab === "Admin" && user.role === "manager" && <AdminView users={resto.users} setUsers={setUsers} records={resto.records} restoId={resto.id} subscribed={resto.subscribed} />
           {activeTab === "Abonnement" && user.role === "manager" && <SubscriptionView subscribed={resto.subscribed} setSubscribed={setSubscribed} setActiveTab={setActiveTab} />}
         </main>
       </div>
@@ -1041,7 +1041,7 @@ function TeamView({ users, records }) {
 }
 
 /* ─── ADMIN VIEW ─── */
-function AdminView({ users, setUsers, records, restoId }) {
+function AdminView({ users, setUsers, records, restoId, subscribed }) {
   const [newName, setNewName] = useState("");
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -1090,7 +1090,9 @@ function AdminView({ users, setUsers, records, restoId }) {
             <option value="manager">Manager</option>
           </select>
         </div>
-        <button className="add-btn" onClick={addUser} disabled={!newName || !newUsername || !newPassword}>+ Ajouter</button>
+<button className="add-btn" onClick={addUser} disabled={!newName || !newUsername || !newPassword || !subscribed}>+ Ajouter</button>
+{!subscribed && <div style={{marginTop: 8, fontSize: 12, color: "var(--red)"}}>🔒 Abonnement requis pour ajouter des employés</div>}
+{!subscribed && <div style={{marginTop: 8, fontSize: 12, color: "var(--red)"}}>🔒 Abonnement requis pour ajouter des employés</div>}
       </div>
     </>
   );
