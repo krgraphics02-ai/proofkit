@@ -768,7 +768,8 @@ const b64 = await toBase64(compressed);
           model: "claude-haiku-4-5-20251001",
           max_tokens: 1000,
           messages: [{ role: "user", content: [
-            { type: "image", source: { type: "base64", media_type: imgFile.type || "image/jpeg", data: b64 } },
+           { type: "image", source: { type: "base64", media_type: imgFile.type || "image/jpeg", data: b64 } },
+...(imgFile2 ? [{ type: "image", source: { type: "base64", media_type: imgFile2.type || "image/jpeg", data: await toBase64(await compressImage(imgFile2)) } }] : []),
             { type: "text", text: `Tu es un système d'analyse de commandes restaurant de livraison (Uber Eats, Deliveroo, Just Eat, etc).
 
 Analyse cette photo de ticket et réponds UNIQUEMENT en JSON valide sans markdown :
@@ -802,6 +803,7 @@ record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
   items_detected: record.items_detected,
   confidence: record.confidence,
   img_src: record.imgSrc,
+  img_src_2: imgFile2 ? (await uploadToSupabase(imgFile2, timestamp)) : null,
   timestamp: record.timestamp
 }]);
 addRecord(record);
