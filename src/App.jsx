@@ -310,6 +310,7 @@ useEffect(() => {
   );
 
   const resto = data.restaurants.find(r => r.id === session.restoId);
+if (!resto) { setSession(null); return null; }
   return (
     <RestoApp
       resto={resto} user={session.user}
