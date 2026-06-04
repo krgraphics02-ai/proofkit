@@ -596,6 +596,8 @@ useEffect(() => {
         ...r,
         imgSrc: r.img_src,
         img_src_2: r.img_src_2,
+        img_b64: r.img_b64,
+        img_b64_2: r.img_b64_2,
         authorId: r.author_id,
         id: r.id
       }));
@@ -941,8 +943,29 @@ const deleteRecord = async (id) => {
               {selected.anomaly && <div className="result-row"><span className="result-row-label">Anomalie</span><span className="result-row-value" style={{ color: "var(--yellow)" }}>{selected.anomaly}</span></div>}
               <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }}onClick={async () => {
   try {
-    const dl = async (url, filename) => {
-      const res = await fetch(`/api/download?url=${encodeURIComponent(url)}&timestamp=${encodeURIComponent(selected.timestamp)}`);
+    onClick={() => {
+  try {
+    const date = new Date(selected.timestamp).toISOString().slice(0,10);
+    if (selected.img_b64) {
+      const link = document.createElement("a");
+      link.href = selected.img_b64;
+      link.download = `commande-${selected.order_number || "inconnu"}-${date}.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    if (selected.img_b64_2) {
+      const link2 = document.createElement("a");
+      link2.href = selected.img_b64_2;
+      link2.download = `commande-${selected.order_number || "inconnu"}-${date}-2.jpg`;
+      document.body.appendChild(link2);
+      link2.click();
+      document.body.removeChild(link2);
+    }
+  } catch(e) {
+    alert("Erreur : " + e.message);
+  }
+}}
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
