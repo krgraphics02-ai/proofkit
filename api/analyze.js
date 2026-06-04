@@ -13,8 +13,10 @@ export default async function handler(req, res) {
     });
     
     const data = await response.json();
+    console.log("Anthropic response:", JSON.stringify(data).slice(0, 500));
     res.status(200).json(data);
   } catch (e) {
+    console.error("Error:", e.message);
     res.status(500).json({ error: e.message });
   }
 }
