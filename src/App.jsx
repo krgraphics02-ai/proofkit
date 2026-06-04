@@ -654,7 +654,7 @@ subscribed={resto.subscribed} setActiveTab={setActiveTab} />}
           {activeTab === "Preuves" && <RecordsView records={resto.records} setRecords={setRecords} currentUser={user} dark={dark} />}
           {activeTab === "Alertes" && <AlertsView alerts={resto.alerts} dismissAlert={dismissAlert} currentUser={user} />}
           {activeTab === "Équipe" && user.role === "manager" && <TeamView users={resto.users} records={resto.records} />}
-          {activeTab === "Admin" && user.role === "manager" && <AdminView users={resto.users} setUsers={setUsers} records={resto.records} />}
+         {activeTab === "Admin" && user.role === "manager" && <AdminView users={resto.users} setUsers={setUsers} records={resto.records} restoId={resto.id} />}
           {activeTab === "Abonnement" && user.role === "manager" && <SubscriptionView subscribed={resto.subscribed} setSubscribed={setSubscribed} setActiveTab={setActiveTab} />}
         </main>
       </div>
@@ -1041,15 +1041,20 @@ function TeamView({ users, records }) {
 }
 
 /* ─── ADMIN VIEW ─── */
-function AdminView({ users, setUsers, records }) {
+function AdminView({ users, setUsers, records, restoId }) {
   const [newName, setNewName] = useState("");
   const [newUsername, setNewUsername] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newRole, setNewRole] = useState("employee");
 
-  const addUser = () => {
+  const addUser = async () => {
     if (!newName || !newUsername || !newPassword) return;
-    setUsers(prev => [...prev, { id: Date.now().toString(), name: newName, username: newUsername, password: newPassword, role: newRole }]);
+    const { data: userData } = await supabase.from('users').insert([{
+      restaurant_id: restoId,
+      name: newName, username: newUsername, email: newUsername,
+      password: newPassword, role: newRole
+    }]).select().single();
+    if (userData) setUsers(prev => [...prev, userData]);
     setNewName(""); setNewUsername(""); setNewPassword(""); setNewRole("employee");
   };
 
