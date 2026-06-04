@@ -753,7 +753,13 @@ const fixExifDate = (base64Img, timestamp) => {
     try {
 const compressed = await compressImage(imgFile);
 const b64 = await toBase64(compressed);
-const uploadedUrl = fixExifDate("data:image/jpeg;base64," + b64, timestamp);
+const fixedB64 = fixExifDate("data:image/jpeg;base64," + b64, timestamp);
+let uploadedUrl = null;
+try {
+  uploadedUrl = await uploadToSupabase(imgFile, timestamp);
+} catch(e) {
+  console.error("Upload error:", e);
+}
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { 
@@ -802,6 +808,8 @@ record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
   confidence: record.confidence,
   img_src: record.imgSrc,
   img_src_2: imgFile2 ? (await uploadToSupabase(imgFile2, timestamp)) : null,
+  img_b64: fixedB64,
+  img_b64_2: imgFile2 ? fixExifDate("data:image/jpeg;base64," + await toBase64(await compressImage(imgFile2)), timestamp) : null,
   timestamp: record.timestamp
 }]);
 addRecord(record);
