@@ -570,7 +570,7 @@ useEffect(() => {
     const { data } = await supabase
       .from('records')
       .select('*')
-      .eq('restaurant_id', user.id)
+      .eq('restaurant_id', resto.id)
       .order('timestamp', { ascending: false });
     if (data && data.length > 0) {
       const formatted = data.map(r => ({
@@ -627,7 +627,8 @@ useEffect(() => {
           </div>
         </nav>
         <main className="main">
-          {activeTab === "Capturer" && <CaptureView currentUser={user} addRecord={addRecord} subscribed={resto.subscribed} setActiveTab={setActiveTab} />}
+          {activeTab === "Capturer" && <CaptureView currentUser={user} restoId={resto.id} addRecord={addRecord} 
+subscribed={resto.subscribed} setActiveTab={setActiveTab} />}
           {activeTab === "Preuves" && <RecordsView records={resto.records} setRecords={setRecords} currentUser={user} dark={dark} />}
           {activeTab === "Alertes" && <AlertsView alerts={resto.alerts} dismissAlert={dismissAlert} currentUser={user} />}
           {activeTab === "Équipe" && user.role === "manager" && <TeamView users={resto.users} records={resto.records} />}
@@ -640,7 +641,7 @@ useEffect(() => {
 }
 
 /* ─── CAPTURE VIEW ─── */
-function CaptureView({ currentUser, addRecord, subscribed, setActiveTab }) {
+function CaptureView({ currentUser, restoId, addRecord, subscribed, setActiveTab }) {
   const [imgSrc, setImgSrc] = useState(null);
   const [imgFile, setImgFile] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -754,7 +755,7 @@ record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
       record = { order_number: null, status: "warning", anomaly: "Erreur: " + e.message, items_detected: null, confidence: "low", timestamp, imgSrc };
     }
     await supabase.from('records').insert([{
-  restaurant_id: currentUser.id,
+  restaurant_id: restoId,
   author: currentUser.name,
   author_id: currentUser.id,
   order_number: record.order_number,
