@@ -938,27 +938,19 @@ const deleteRecord = async (id) => {
               {selected.anomaly && <div className="result-row"><span className="result-row-label">Anomalie</span><span className="result-row-value" style={{ color: "var(--yellow)" }}>{selected.anomaly}</span></div>}
               <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }} onClick={() => {
   try {
-    const img = selected.imgSrc;
-    const base64 = img.split(",")[1];
-    const dateObj = new Date(selected.timestamp);
-    const pad = n => String(n).padStart(2, '0');
-    const exifDate = `${dateObj.getFullYear()}:${pad(dateObj.getMonth()+1)}:${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
-    const exifObj = { "0th": {}, "Exif": {} };
-    exifObj["0th"][piexif.ImageIFD.DateTime] = exifDate;
-    exifObj["Exif"][piexif.ExifIFD.DateTimeOriginal] = exifDate;
-    exifObj["Exif"][piexif.ExifIFD.DateTimeDigitized] = exifDate;
-    const exifStr = piexif.dump(exifObj);
-    const newBase64 = piexif.insert(exifStr, "data:image/jpeg;base64," + base64);
-    const link = document.createElement("a");
-    link.href = newBase64;
-    link.download = `commande-${selected.order_number || "inconnu"}-${dateObj.getFullYear()}${pad(dateObj.getMonth()+1)}${pad(dateObj.getDate())}.jpg`;
-    link.click();
+const link = document.createElement("a");
+link.href = selected.imgSrc;
+link.download = `commande-${selected.order_number || "inconnu"}-${new Date(selected.timestamp).toISOString().slice(0,10)}.jpg`;
+link.target = "_blank";
+link.click();
 if (selected.img_src_2) {
   const link2 = document.createElement("a");
   link2.href = selected.img_src_2;
-  link2.download = `commande-${selected.order_number || "inconnu"}-${dateObj.getFullYear()}${pad(dateObj.getMonth()+1)}${pad(dateObj.getDate())}-2.jpg`;
+  link2.download = `commande-${selected.order_number || "inconnu"}-${new Date(selected.timestamp).toISOString().slice(0,10)}-2.jpg`;
+  link2.target = "_blank";
   link2.click();
 }
+    
   } catch(e) {
     alert("Erreur lors du téléchargement : " + e.message);
   }
@@ -1095,7 +1087,6 @@ await supabase.from('users').delete().eq('id', u.id);
           </select>
         </div>
 <button className="add-btn" onClick={addUser} disabled={!newName || !newUsername || !newPassword || !subscribed}>+ Ajouter</button>
-{!subscribed && <div style={{marginTop: 8, fontSize: 12, color: "var(--red)"}}>🔒 Abonnement requis pour ajouter des employés</div>}
 {!subscribed && <div style={{marginTop: 8, fontSize: 12, color: "var(--red)"}}>🔒 Abonnement requis pour ajouter des employés</div>}
       </div>
     </>
