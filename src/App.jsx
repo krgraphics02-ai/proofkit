@@ -663,6 +663,8 @@ subscribed={resto.subscribed} setActiveTab={setActiveTab} />}
 function CaptureView({ currentUser, restoId, addRecord, subscribed, setActiveTab }) {
   const [imgSrc, setImgSrc] = useState(null);
   const [imgFile, setImgFile] = useState(null);
+const [imgFile2, setImgFile2] = useState(null);
+const [imgSrc2, setImgSrc2] = useState(null);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [drag, setDrag] = useState(false);
