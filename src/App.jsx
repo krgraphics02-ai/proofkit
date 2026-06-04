@@ -753,7 +753,12 @@ const fixExifDate = (base64Img, timestamp) => {
     try {
 let uploadedUrl = null;
 try {
-  uploadedUrl = await uploadToSupabase(imgFile, timestamp);
+  const compressed = await compressImage(imgFile);
+  const b64 = await toBase64(compressed);
+  const fixedB64 = fixExifDate("data:image/jpeg;base64," + b64, timestamp);
+  const fixedBlob = await fetch(fixedB64).then(r => r.blob());
+  const fixedFile = new File([fixedBlob], imgFile.name, { type: 'image/jpeg' });
+  uploadedUrl = await uploadToSupabase(fixedFile, timestamp);
 } catch(e) {
   console.error("Upload error:", e);
 }
