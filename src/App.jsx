@@ -939,49 +939,25 @@ const deleteRecord = async (id) => {
               <div className="result-row"><span className="result-row-label">Pris par</span><span className="result-row-value">{selected.author}</span></div>
               {selected.items_detected && <div className="result-row"><span className="result-row-label">Articles</span><span className="result-row-value">{selected.items_detected}</span></div>}
               {selected.anomaly && <div className="result-row"><span className="result-row-label">Anomalie</span><span className="result-row-value" style={{ color: "var(--yellow)" }}>{selected.anomaly}</span></div>}
-              <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }} onClick={async () => {
+              <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }} onClick={() => {
   try {
-    const downloadAndStamp = async (url, filename) => {
-      const response = await fetch(`/api/download?url=${encodeURIComponent(url)}`);
-      const blob = await response.blob();
-      const reader = new FileReader();
-      const base64 = await new Promise(res => { reader.onload = () => res(reader.result); reader.readAsDataURL(blob); });
-      const jpegBase64 = base64.includes("data:image/jpeg") ? base64 : "data:image/jpeg;base64," + base64.split(",")[1];
-      const dateObj = new Date(selected.timestamp);
-      const pad = n => String(n).padStart(2, '0');
-      const exifDate = `${dateObj.getFullYear()}:${pad(dateObj.getMonth()+1)}:${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
-      const exifObj = { "0th": {}, "Exif": {} };
-      exifObj["0th"][piexif.ImageIFD.DateTime] = exifDate;
-      exifObj["Exif"][piexif.ExifIFD.DateTimeOriginal] = exifDate;
-      exifObj["Exif"][piexif.ExifIFD.DateTimeDigitized] = exifDate;
-      const exifStr = piexif.dump(exifObj);
-      const stamped = piexif.insert(exifStr, jpegBase64);
-      const base64Data = stamped.split(",")[1];
-      const byteCharacters = atob(base64Data);
-      const byteArray = new Uint8Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteArray[i] = byteCharacters.charCodeAt(i);
-      }
-      const blob = new Blob([byteArray], { type: "image/jpeg" });
-      const blobUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
-    };
-    const dateObj = new Date(selected.timestamp);
-    const pad = n => String(n).padStart(2, '0');
-    const dateName = `${dateObj.getFullYear()}${pad(dateObj.getMonth()+1)}${pad(dateObj.getDate())}-${pad(dateObj.getHours())}h${pad(dateObj.getMinutes())}`;
-    await downloadAndStamp(selected.imgSrc, `commande-${selected.order_number || "inconnu"}-${dateName}.jpg`);
-    if (selected.img_src_2) await downloadAndStamp(selected.img_src_2, `commande-${selected.order_number || "inconnu"}-${dateName}-2.jpg`);
+    const link = document.createElement("a");
+    link.href = selected.imgSrc;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    if (selected.img_src_2) {
+      const link2 = document.createElement("a");
+      link2.href = selected.img_src_2;
+      link2.download = `commande-${selected.order_number || "inconnu"}-${new Date(selected.timestamp).toISOString().slice(0,10)}-2.jpg`;
+      document.body.appendChild(link2);
+      link2.click();
+      document.body.removeChild(link2);
+    }
   } catch(e) {
-    alert("Erreur lors du téléchargement : " + e.message);
+    alert("Erreur : " + e.message);
   }
 }}
-link.download = `commande-${selected.order_number || "inconnu"}-${new Date(selected.timestamp).toISOString().slice(0,10)}.jpg`;
 link.click();
 if (selected.img_src_2) {
   const link2 = document.createElement("a");
