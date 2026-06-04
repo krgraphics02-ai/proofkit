@@ -939,26 +939,27 @@ const deleteRecord = async (id) => {
               <div className="result-row"><span className="result-row-label">Pris par</span><span className="result-row-value">{selected.author}</span></div>
               {selected.items_detected && <div className="result-row"><span className="result-row-label">Articles</span><span className="result-row-value">{selected.items_detected}</span></div>}
               {selected.anomaly && <div className="result-row"><span className="result-row-label">Anomalie</span><span className="result-row-value" style={{ color: "var(--yellow)" }}>{selected.anomaly}</span></div>}
-              <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }}onClick={() => {
+              <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }}onClick={async () => {
   try {
-    const link = document.createElement("a");
-    link.href = selected.imgSrc;
-    link.download = `commande-${selected.order_number || "inconnu"}-${new Date(selected.timestamp).toISOString().slice(0,10)}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    if (selected.img_src_2) {
-      const link2 = document.createElement("a");
-      link2.href = selected.img_src_2;
-      link2.download = `commande-${selected.order_number || "inconnu"}-${new Date(selected.timestamp).toISOString().slice(0,10)}-2.jpg`;
-      document.body.appendChild(link2);
-      link2.click();
-      document.body.removeChild(link2);
-    }
+    const dl = async (url, filename) => {
+      const res = await fetch(`/api/download?url=${encodeURIComponent(url)}`);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
+    };
+    const date = new Date(selected.timestamp).toISOString().slice(0,10);
+    await dl(selected.imgSrc, `commande-${selected.order_number || "inconnu"}-${date}.jpg`);
+    if (selected.img_src_2) await dl(selected.img_src_2, `commande-${selected.order_number || "inconnu"}-${date}-2.jpg`);
   } catch(e) {
     alert("Erreur : " + e.message);
   }
-}}>📥 Télécharger la preuve</button>
+}}📥 Télécharger la preuve</button>
 {currentUser.role === "manager" && <button className="modal-del-btn" onClick={() => deleteRecord(selected.id)}>🗑 Supprimer</button>}
             </div>
           </div>
