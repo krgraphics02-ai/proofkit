@@ -654,7 +654,7 @@ subscribed={resto.subscribed} setActiveTab={setActiveTab} />}
           {activeTab === "Preuves" && <RecordsView records={resto.records} setRecords={setRecords} currentUser={user} dark={dark} />}
           {activeTab === "Alertes" && <AlertsView alerts={resto.alerts} dismissAlert={dismissAlert} currentUser={user} />}
           {activeTab === "Équipe" && user.role === "manager" && <TeamView users={resto.users} records={resto.records} />}
-         {activeTab === "Admin" && user.role === "manager" && <AdminView users={resto.users} setUsers={setUsers} records={resto.records} restoId={resto.id} subscribed={resto.subscribed} />
+         {activeTab === "Admin" && user.role === "manager" && <AdminView users={resto.users} setUsers={setUsers} records={resto.records} restoId={resto.id} subscribed={resto.subscribed} />}
           {activeTab === "Abonnement" && user.role === "manager" && <SubscriptionView subscribed={resto.subscribed} setSubscribed={setSubscribed} setActiveTab={setActiveTab} />}
         </main>
       </div>
