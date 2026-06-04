@@ -285,9 +285,18 @@ const statusInfo = (s) => {
 /* ─── ROOT ─── */
 export default function ProofKit() {
   const [data, setData] = useState(INIT_DATA);
-  const [session, setSession] = useState(null); // { type: "superadmin" } | { type: "resto", restoId, user }
+  const [session, setSession] = useState(() => {
+  try {
+    const saved = localStorage.getItem('proofkit_session');
+    return saved ? JSON.parse(saved) : null;
+  } catch { return null; }
+}); // { type: "superadmin" } | { type: "resto", restoId, user }
   const [dark, setDark] = useState(true);
 
+useEffect(() => {
+  if (session) localStorage.setItem('proofkit_session', JSON.stringify(session));
+  else localStorage.removeItem('proofkit_session');
+}, [session]);
   const updateResto = (restoId, updater) => {
     setData(prev => ({
       ...prev,
