@@ -310,7 +310,16 @@ useEffect(() => {
   );
 
   const resto = data.restaurants.find(r => r.id === session.restoId);
-if (!resto) { setSession(null); return null; }
+if (!resto) {
+  supabase.from('restaurants').select('*').eq('id', session.restoId).single().then(({ data: r }) => {
+    if (r) {
+      setData(prev => ({ ...prev, restaurants: [...prev.restaurants, { id: r.id, name: r.name, emoji: "🍽️", subscribed: r.subscribed, users: [], records: [], alerts: [] }] }));
+    } else {
+      setSession(null);
+    }
+  });
+  return null;
+}
   return (
     <RestoApp
       resto={resto} user={session.user}
