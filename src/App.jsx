@@ -678,11 +678,19 @@ useEffect(() => {
   if (!subscribed) checkDaily();
 }, [subscribed]);
 
-  const handleFile = (file) => {
+const handleFile = (file) => {
     if (!file) return;
     setImgFile(file); setDone(false);
     const r = new FileReader();
     r.onload = e => setImgSrc(e.target.result);
+    r.readAsDataURL(file);
+  };
+
+  const handleFile2 = (file) => {
+    if (!file) return;
+    setImgFile2(file);
+    const r = new FileReader();
+    r.onload = e => setImgSrc2(e.target.result);
     r.readAsDataURL(file);
   };
 const uploadToSupabase = async (file, timestamp) => {
@@ -831,6 +839,18 @@ if (!subscribed && currentUser.role !== "manager") return (
             <img src={imgSrc} alt="preview" className="preview-img" />
             {!loading && !done && <button className="preview-change" onClick={() => { setImgSrc(null); setImgFile(null); }}>Changer</button>}
           </div>
+{!imgSrc2 && !loading && !done && (
+  <div className="upload-zone" style={{ marginBottom: 12, padding: 20 }}>
+    <input type="file" accept="image/*" capture="environment" onChange={e => handleFile2(e.target.files[0])} />
+    <div style={{ fontSize: 14, fontWeight: 700 }}>📎 Ajouter une 2ème photo</div>
+  </div>
+)}
+{imgSrc2 && (
+  <div className="preview-wrap" style={{ marginBottom: 12 }}>
+    <img src={imgSrc2} alt="preview 2" className="preview-img" />
+    {!loading && !done && <button className="preview-change" onClick={() => { setImgSrc2(null); setImgFile2(null); }}>Supprimer</button>}
+  </div>
+)}
           {loading && (<><div className="loading-bar"><div className="loading-bar-inner" /></div><div className="loading-text">Analyse en cours · Horodatage...</div></>)}
           {done && <div style={{ textAlign: "center", padding: "16px 0", fontSize: 15, color: "var(--green)", fontWeight: 700 }}>✅ Preuve envoyée — redirection...</div>}
           {!loading && !done && <button className="send-btn" onClick={handleSubmit} disabled={!subscribed && dailyCount >= 10}>📤 Envoyer</button>}
