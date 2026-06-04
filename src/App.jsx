@@ -249,7 +249,7 @@ const makeStyles = (dark) => `
 
 /* ─── DATA INITIALE ─── */
 const INIT_DATA = {
-  superadmin: { username: "superadmin", password: "admin123" },
+  superadmin: { username: "seyana", password: "seyana060923" },
   restaurants: []
 };
 const fmtDate = (iso) => {
