@@ -796,7 +796,7 @@ Si tu vois un code en gros caractères en haut, c'est FORCÉMENT le numéro de c
       const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
       const fixedImg = fixExifDate(imgSrc, timestamp);
 record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
-    } catch {
+    } catch(e) {
       record = { order_number: null, status: "warning", anomaly: "Erreur: " + e.message, items_detected: null, confidence: "low", timestamp, imgSrc };
     }
     await supabase.from('records').insert([{
