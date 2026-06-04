@@ -666,6 +666,15 @@ function CaptureView({ currentUser, restoId, addRecord, subscribed, setActiveTab
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [drag, setDrag] = useState(false);
+const [dailyCount, setDailyCount] = useState(0);
+useEffect(() => {
+  const checkDaily = async () => {
+    const today = new Date().toISOString().slice(0,10);
+    const { count } = await supabase.from('records').select('*', { count: 'exact' }).eq('restaurant_id', restoId).gte('timestamp', today + 'T00:00:00').lte('timestamp', today + 'T23:59:59');
+    setDailyCount(count || 0);
+  };
+  if (!subscribed) checkDaily();
+}, [subscribed]);
 
   const handleFile = (file) => {
     if (!file) return;
@@ -790,7 +799,8 @@ addRecord(record);
     setTimeout(() => { setActiveTab("Preuves"); setImgSrc(null); setImgFile(null); setDone(false); }, 1200);
   };
 
-  if (!subscribed && currentUser.role !== "manager") return (
+
+if (!subscribed && currentUser.role !== "manager") return (
     <div className="empty-state"><div className="empty-icon">🔒</div><div style={{ marginBottom: 8 }}>Abonnement requis</div><div style={{ fontSize: 13 }}>Demande au manager d'activer l'abonnement.</div></div>
   );
 
@@ -820,7 +830,8 @@ addRecord(record);
           </div>
           {loading && (<><div className="loading-bar"><div className="loading-bar-inner" /></div><div className="loading-text">Analyse en cours · Horodatage...</div></>)}
           {done && <div style={{ textAlign: "center", padding: "16px 0", fontSize: 15, color: "var(--green)", fontWeight: 700 }}>✅ Preuve envoyée — redirection...</div>}
-          {!loading && !done && <button className="send-btn" onClick={handleSubmit}>📤 Envoyer</button>}
+          {!loading && !done && <button className="send-btn" onClick={handleSubmit} disabled={!subscribed && dailyCount >= 10}>📤 Envoyer</button>}
+{!subscribed && dailyCount >= 10 && <div style={{textAlign:"center", color:"var(--red)", fontSize:13, marginBottom:12}}>🔒 Limite de 10 photos/jour atteinte — <span style={{color:"var(--orange)", cursor:"pointer"}} onClick={() => setActiveTab("Abonnement")}>S'abonner →</span></div>}
         </>
       )}
     </>
