@@ -854,7 +854,11 @@ function RecordsView({ records, setRecords, currentUser, dark }) {
     return matchSearch && matchFilter && (!dateFrom || day >= dateFrom) && (!dateTo || day <= dateTo);
   });
 
-  const deleteRecord = (id) => { setRecords(prev => prev.filter(r => r.id !== id)); setSelected(null); };
+const deleteRecord = async (id) => {
+  await supabase.from('records').delete().eq('id', id);
+  setRecords(prev => prev.filter(r => r.id !== id));
+  setSelected(null);
+};
 
   return (
     <>
