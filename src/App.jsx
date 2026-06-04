@@ -926,6 +926,7 @@ const deleteRecord = async (id) => {
               <button className="modal-close" onClick={() => setSelected(null)}>×</button>
             </div>
             <img src={selected.imgSrc} alt="preuve" className="modal-img" />
+{selected.img_src_2 && <img src={selected.img_src_2} alt="preuve 2" className="modal-img" style={{ borderTop: "1px solid var(--border)" }} />}
             <div className="modal-body">
               <div className="result-row"><span className="result-row-label">Statut</span><span className={`status-badge ${statusInfo(selected.status).cls}`}>{statusInfo(selected.status).label}</span></div>
               <div className="result-row"><span className="result-row-label">Horodatage</span><span className="timestamp">{fmtDate(selected.timestamp)}</span></div>
@@ -949,6 +950,12 @@ const deleteRecord = async (id) => {
     link.href = newBase64;
     link.download = `commande-${selected.order_number || "inconnu"}-${dateObj.getFullYear()}${pad(dateObj.getMonth()+1)}${pad(dateObj.getDate())}.jpg`;
     link.click();
+if (selected.img_src_2) {
+  const link2 = document.createElement("a");
+  link2.href = selected.img_src_2;
+  link2.download = `commande-${selected.order_number || "inconnu"}-${dateObj.getFullYear()}${pad(dateObj.getMonth()+1)}${pad(dateObj.getDate())}-2.jpg`;
+  link2.click();
+}
   } catch(e) {
     alert("Erreur lors du téléchargement : " + e.message);
   }
