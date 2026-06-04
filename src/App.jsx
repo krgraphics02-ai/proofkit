@@ -635,7 +635,16 @@ function CaptureView({ currentUser, addRecord, subscribed, setActiveTab }) {
     r.onload = e => setImgSrc(e.target.result);
     r.readAsDataURL(file);
   };
-
+const uploadToSupabase = async (file, timestamp) => {
+  const ext = file.type.includes('png') ? 'png' : 'jpg';
+  const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const { data, error } = await supabase.storage
+    .from('proofs')
+    .upload(fileName, file, { contentType: file.type });
+  if (error) return null;
+  const { data: urlData } = supabase.storage.from('proofs').getPublicUrl(fileName);
+  return urlData.publicUrl;
+};
 const toBase64 = (file) => new Promise((res, rej) => {
     const r = new FileReader();
     r.onload = () => res(r.result.split(",")[1]);
@@ -665,6 +674,7 @@ const fixExifDate = (base64Img, timestamp) => {
     const timestamp = new Date().toISOString();
     let record;
     try {
+const uploadedUrl = await uploadToSupabase(imgFile, timestamp);
       const b64 = await toBase64(imgFile);
       const res = await fetch("/api/analyze", {
         method: "POST",
@@ -698,7 +708,7 @@ Si tu vois un code en gros caractères en haut, c'est FORCÉMENT le numéro de c
       const text = data.content?.map(b => b.text || "").join("") || "{}";
       const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
       const fixedImg = fixExifDate(imgSrc, timestamp);
-record = { ...parsed, timestamp, imgSrc: fixedImg };
+record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
     } catch {
       record = { order_number: null, status: "warning", anomaly: "Erreur: " + e.message, items_detected: null, confidence: "low", timestamp, imgSrc };
     }
