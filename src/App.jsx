@@ -943,6 +943,7 @@ const deleteRecord = async (id) => {
       const blob = await response.blob();
       const reader = new FileReader();
       const base64 = await new Promise(res => { reader.onload = () => res(reader.result); reader.readAsDataURL(blob); });
+      const jpegBase64 = base64.includes("data:image/jpeg") ? base64 : "data:image/jpeg;base64," + base64.split(",")[1];
       const dateObj = new Date(selected.timestamp);
       const pad = n => String(n).padStart(2, '0');
       const exifDate = `${dateObj.getFullYear()}:${pad(dateObj.getMonth()+1)}:${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
@@ -951,7 +952,7 @@ const deleteRecord = async (id) => {
       exifObj["Exif"][piexif.ExifIFD.DateTimeOriginal] = exifDate;
       exifObj["Exif"][piexif.ExifIFD.DateTimeDigitized] = exifDate;
       const exifStr = piexif.dump(exifObj);
-      const stamped = piexif.insert(exifStr, base64.startsWith("data:image/jpeg") ? base64 : base64.replace("data:image/", "data:image/jpeg;").split(";base64,")[0] + ";base64," + base64.split(";base64,")[1]);
+      const stamped = piexif.insert(exifStr, jpegBase64);
       const link = document.createElement("a");
       link.href = stamped;
       link.download = filename;
