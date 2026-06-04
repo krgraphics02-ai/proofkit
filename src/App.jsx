@@ -595,6 +595,7 @@ useEffect(() => {
       const formatted = data.map(r => ({
         ...r,
         imgSrc: r.img_src,
+        img_src_2: r.img_src_2,
         authorId: r.author_id,
         id: r.id
       }));
