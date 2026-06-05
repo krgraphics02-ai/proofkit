@@ -515,6 +515,11 @@ const deleteResto = async (id) => {
   return (
     <>
       <style>{makeStyles(dark)}</style>
+      {!resto.subscribed && (
+        <div style={{ background: "linear-gradient(90deg, var(--orange), #ff8c00)", color: "#fff", textAlign: "center", padding: "10px 16px", fontSize: 13, fontWeight: 700, letterSpacing: 0.5 }}>
+          🎁 Profitez de 7 jours gratuits — Sans engagement · Résiliation à tout moment
+        </div>
+      )}
       <div className="app">
         <nav className="nav">
           <div className="nav-left">
@@ -1162,6 +1167,9 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab }) {
             <button className="sub-btn" onClick={handleSubscribe} disabled={loading}>
               {loading ? "Redirection..." : "S'abonner pour 14,99€ / mois →"}
             </button>
+            <div style={{ background: "var(--green-soft)", border: "1px solid rgba(0,230,118,0.2)", borderRadius: 10, padding: "12px 16px", textAlign: "center", fontSize: 13, color: "var(--green)", fontWeight: 700, marginBottom: 12 }}>
+              🎁 7 jours gratuits inclus — aucun paiement aujourd'hui
+            </div>
             <div className="sub-note">Résiliation possible à tout moment · Sans engagement</div>
           </div>
         </>
