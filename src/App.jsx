@@ -814,7 +814,8 @@ record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
     } catch(e) {
       record = { order_number: null, status: "warning", anomaly: "Erreur: " + e.message, items_detected: null, confidence: "low", timestamp, imgSrc };
     }
-    await supabase.from('records').insert([{
+    const imgSrc2Url = imgFile2 ? (await uploadToSupabase(imgFile2, timestamp)) : null;
+await supabase.from('records').insert([{
   restaurant_id: restoId,
   author: currentUser.name,
   author_id: currentUser.id,
@@ -824,10 +825,10 @@ record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
   items_detected: record.items_detected,
   confidence: record.confidence,
   img_src: record.imgSrc,
-  img_src_2: imgFile2 ? (await uploadToSupabase(imgFile2, timestamp)) : null,
+  img_src_2: imgSrc2Url,
   timestamp: record.timestamp
 }]);
-addRecord(record);
+addRecord({ ...record, img_src_2: imgSrc2Url });
 if (!subscribed) setDailyCount(prev => prev + 1);
     setLoading(false); setDone(true);
     setTimeout(() => { setActiveTab("Preuves"); setImgSrc(null); setImgFile(null); setDone(false); }, 1200);
