@@ -755,19 +755,13 @@ const fixExifDate = (base64Img, timestamp) => {
     try {
 const compressed = await compressImage(imgFile);
 const b64 = await toBase64(compressed);
-const fixedB64 = fixExifDate("data:image/jpeg;base64," + b64, timestamp);
 let uploadedUrl = null;
 try {
-  const byteString = atob(fixedB64.split(',')[1]);
-  const byteArray = new Uint8Array(byteString.length);
-  for (let i = 0; i < byteString.length; i++) byteArray[i] = byteString.charCodeAt(i);
-  const fixedBlob = new Blob([byteArray], { type: 'image/jpeg' });
-  const fixedFile = new File([fixedBlob], imgFile.name, { type: 'image/jpeg' });
-  uploadedUrl = await uploadToSupabase(fixedFile, timestamp);
+  uploadedUrl = await uploadToSupabase(imgFile, timestamp);
 } catch(e) {
   console.error("Upload error:", e);
-  uploadedUrl = await uploadToSupabase(imgFile, timestamp);
 }
+const fixedB64 = fixExifDate("data:image/jpeg;base64," + b64, timestamp);
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { 
