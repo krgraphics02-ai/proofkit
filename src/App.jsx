@@ -1158,6 +1158,7 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab }) {
           <div className="sub-inactive-banner"><span style={{ fontSize: 20 }}>🔒</span><div>Abonnez-vous pour débloquer toutes les fonctionnalités et donner accès à votre équipe.</div></div>
           <div className="sub-card">
             <div className="sub-price">14,99€<span> / mois</span></div>
+            <div style={{ fontSize: 13, color: "var(--green)", fontWeight: 700, marginBottom: 8 }}>🎁 7 jours gratuits — aucun paiement aujourd'hui</div>
             <div className="sub-desc">Tout ce qu'il faut pour protéger votre restaurant des remboursements abusifs.</div>
             <div className="sub-features">
               {["Photos horodatées infalsifiables","Lecture automatique du # de commande","Détection d'anomalies par IA","Alertes en temps réel","Suivi de l'équipe","Employés illimités","Accès depuis tous les téléphones","Support prioritaire"].map(f => (
