@@ -965,25 +965,23 @@ const deleteRecord = async (id) => {
               {selected.anomaly && <div className="result-row"><span className="result-row-label">Anomalie</span><span className="result-row-value" style={{ color: "var(--yellow)" }}>{selected.anomaly}</span></div>}
              <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }} onClick={async () => {
   try {
-    const dl = async (url, filename) => {
-      const res = await fetch(`/api/download?url=${encodeURIComponent(url)}&timestamp=${encodeURIComponent(selected.timestamp)}`);
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(blobUrl);
-    };
     const date = new Date(selected.timestamp).toISOString().slice(0,10);
-    await dl(selected.imgSrc, `commande-${selected.order_number || "inconnu"}-${date}.jpg`);
     const src2 = selected.img_src_2 || selected.imgSrc2;
-    if (src2) {
-      await new Promise(r => setTimeout(r, 500));
-      await dl(src2, `commande-${selected.order_number || "inconnu"}-${date}-2.jpg`);
-    }
+    const JSZip = (await import('jszip')).default;
+    const zip = new JSZip();
+    const fetchImg = async (url) => {
+      const res = await fetch(`/api/download?url=${encodeURIComponent(url)}&timestamp=${encodeURIComponent(selected.timestamp)}`);
+      return await res.blob();
+    };
+    zip.file(`commande-${selected.order_number || "inconnu"}-${date}-1.jpg`, await fetchImg(selected.imgSrc));
+    if (src2) zip.file(`commande-${selected.order_number || "inconnu"}-${date}-2.jpg`, await fetchImg(src2));
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(zipBlob);
+    link.download = `commande-${selected.order_number || "inconnu"}-${date}.zip`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   } catch(e) {
     alert("Erreur : " + e.message);
   }
