@@ -761,7 +761,6 @@ try {
 } catch(e) {
   console.error("Upload error:", e);
 }
-const fixedB64 = fixExifDate("data:image/jpeg;base64," + b64, timestamp);
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { 
