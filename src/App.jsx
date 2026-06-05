@@ -500,10 +500,14 @@ useEffect(() => {
     setNewName(""); setNewEmoji("🍽️"); setNewUser(""); setNewPass("");
   };
 
-  const toggleSub = (id) => setData(prev => ({
-    ...prev,
-    restaurants: prev.restaurants.map(r => r.id === id ? { ...r, subscribed: !r.subscribed } : r)
-  }));
+  const toggleSub = async (id) => {
+    const resto = data.restaurants.find(r => r.id === id);
+    await supabase.from('restaurants').update({ subscribed: !resto.subscribed }).eq('id', id);
+    setData(prev => ({
+      ...prev,
+      restaurants: prev.restaurants.map(r => r.id === id ? { ...r, subscribed: !r.subscribed } : r)
+    }));
+  };
 
 const deleteResto = async (id) => {
   await supabase.from('records').delete().eq('restaurant_id', id);
