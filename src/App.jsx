@@ -254,8 +254,8 @@ const INIT_DATA = {
 };
 const fmtDate = (iso) => {
   const d = new Date(iso);
-  return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' })
-    + ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const pad = n => String(n).padStart(2, '0');
+  return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth()+1)}/${d.getUTCFullYear()} à ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
 };
 const isoDay = (iso) => iso ? iso.slice(0, 10) : "";
 const statusInfo = (s) => {
