@@ -1130,7 +1130,7 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab }) {
   const [loading, setLoading] = useState(false);
   const handleSubscribe = () => {
     setLoading(true);
-    window.location.href = "https://buy.stripe.com/7sYcMX30D4oEbqvbI01gs00";
+    window.location.href = "https://buy.stripe.com/00w28jbx93kA1PV9zS1gs01";
   };
   return (
     <div className="sub-wrap">
