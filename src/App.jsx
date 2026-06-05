@@ -750,8 +750,7 @@ const fixExifDate = (base64Img, timestamp) => {
   const handleSubmit = async () => {
     if (!imgFile) return;
     setLoading(true);
-    const now = new Date();
-const timestamp = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString();
+   const timestamp = new Date().toISOString();
     let record;
     try {
 const compressed = await compressImage(imgFile);
