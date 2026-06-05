@@ -835,6 +835,7 @@ if (!subscribed && currentUser.role !== "manager") return (
       )}
       <div className="section-title">Nouvelle commande — {currentUser.name}</div>
       {!imgSrc ? (
+        <>
         <div className={`upload-zone ${drag ? "drag" : ""}`}
           onDragOver={e => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
           onDrop={e => { e.preventDefault(); setDrag(false); handleFile(e.dataTransfer.files[0]); }}>
@@ -843,6 +844,13 @@ if (!subscribed && currentUser.role !== "manager") return (
           <div className="upload-title">Prendre une photo</div>
           <div className="upload-sub">ou glisser une image ici</div>
         </div>
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
+          <label style={{ width: 80, height: 80, borderRadius: "50%", background: "var(--orange)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 4px 24px rgba(255,107,0,0.5)", border: "5px solid rgba(255,255,255,0.15)", transition: "transform 0.15s" }}>
+            <input type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
+            <span style={{ fontSize: 36 }}>📷</span>
+          </label>
+        </div>
+        </>
       ) : (
         <>
           <div className="preview-wrap">
