@@ -662,6 +662,14 @@ subscribed={resto.subscribed} setActiveTab={setActiveTab} />}
          {activeTab === "Admin" && user.role === "manager" && <AdminView users={resto.users} setUsers={setUsers} records={resto.records} restoId={resto.id} subscribed={resto.subscribed} />}
           {activeTab === "Abonnement" && user.role === "manager" && <SubscriptionView subscribed={resto.subscribed} setSubscribed={setSubscribed} setActiveTab={setActiveTab} />}
         </main>
+        {activeTab !== "Capturer" && (
+          <div style={{ position: "fixed", bottom: 32, left: "50%", transform: "translateX(-50%)", zIndex: 150 }}>
+            <label style={{ width: 72, height: 72, borderRadius: "50%", background: "var(--orange)", border: "5px solid rgba(255,255,255,0.15)", boxShadow: "0 4px 24px rgba(255,107,0,0.5)", cursor: "pointer", fontSize: 32, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <input type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={e => { if(e.target.files[0]) { setActiveTab("Capturer"); setTimeout(() => window.dispatchEvent(new CustomEvent("quickCapture", { detail: e.target.files[0] })), 100); } }} />
+              📷
+            </label>
+          </div>
+        )}
       </div>
     </>
   );
@@ -676,6 +684,11 @@ const [imgSrc2, setImgSrc2] = useState(null);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [drag, setDrag] = useState(false);
+useEffect(() => {
+  const handler = (e) => handleFile(e.detail);
+  window.addEventListener("quickCapture", handler);
+  return () => window.removeEventListener("quickCapture", handler);
+}, []);
 const [dailyCount, setDailyCount] = useState(0);
 useEffect(() => {
   const checkDaily = async () => {
