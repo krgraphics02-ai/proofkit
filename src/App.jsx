@@ -828,7 +828,7 @@ await supabase.from('records').insert([{
   img_src_2: imgSrc2Url,
   timestamp: record.timestamp
 }]);
-addRecord({ ...record, img_src_2: imgSrc2Url });
+addRecord({ ...record, img_src_2: imgSrc2Url, imgSrc2: imgSrc2Url });
 if (!subscribed) setDailyCount(prev => prev + 1);
     setLoading(false); setDone(true);
     setTimeout(() => { setActiveTab("Preuves"); setImgSrc(null); setImgFile(null); setDone(false); }, 1200);
@@ -979,7 +979,8 @@ const deleteRecord = async (id) => {
     };
     const date = new Date(selected.timestamp).toISOString().slice(0,10);
     await dl(selected.imgSrc, `commande-${selected.order_number || "inconnu"}-${date}.jpg`);
-    if (selected.img_src_2) await dl(selected.img_src_2, `commande-${selected.order_number || "inconnu"}-${date}-2.jpg`);
+    const src2 = selected.img_src_2 || selected.imgSrc2;
+    if (src2) await dl(src2, `commande-${selected.order_number || "inconnu"}-${date}-2.jpg`);
   } catch(e) {
     alert("Erreur : " + e.message);
   }
