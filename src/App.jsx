@@ -515,11 +515,6 @@ const deleteResto = async (id) => {
   return (
     <>
       <style>{makeStyles(dark)}</style>
-      {!resto.subscribed && (
-        <div style={{ background: "linear-gradient(90deg, var(--orange), #ff8c00)", color: "#fff", textAlign: "center", padding: "10px 16px", fontSize: 13, fontWeight: 700, letterSpacing: 0.5 }}>
-          🎁 Profitez de 7 jours gratuits — Sans engagement · Résiliation à tout moment
-        </div>
-      )}
       <div className="app">
         <nav className="nav">
           <div className="nav-left">
