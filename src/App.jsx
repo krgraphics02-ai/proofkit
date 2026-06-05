@@ -1139,10 +1139,10 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab }) {
         <>
           <div className="sub-active">
             <span style={{ fontSize: 32 }}>✅</span>
-            <div><div className="sub-active-title">Abonnement actif</div><div className="sub-active-sub">Prochain renouvellement dans 30 jours · 20,99€/mois</div></div>
+            <div><div className="sub-active-title">Abonnement actif</div><div className="sub-active-sub">Prochain renouvellement dans 30 jours · 14,99€/mois</div></div>
           </div>
           <div style={{ background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 16, padding: 24 }}>
-            {[["Plan","ProofKit Pro"],["Prix","20,99€ / mois"],["Employés","Illimités"],["Preuves","Illimitées"],["Support","Email prioritaire"]].map(([k,v]) => (
+            {[["Plan","ProofKit Pro"],["Prix","14,99€ / mois"],["Employés","Illimités"],["Preuves","Illimitées"],["Support","Email prioritaire"]].map(([k,v]) => (
               <div key={k} className="result-row"><span className="result-row-label">{k}</span><span className="result-row-value">{v}</span></div>
             ))}
             <button className="modal-del-btn" onClick={() => setSubscribed(false)}>Résilier l'abonnement</button>
@@ -1152,7 +1152,7 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab }) {
         <>
           <div className="sub-inactive-banner"><span style={{ fontSize: 20 }}>🔒</span><div>Abonnez-vous pour débloquer toutes les fonctionnalités et donner accès à votre équipe.</div></div>
           <div className="sub-card">
-            <div className="sub-price">20,99€<span> / mois</span></div>
+            <div className="sub-price">14,99€<span> / mois</span></div>
             <div className="sub-desc">Tout ce qu'il faut pour protéger votre restaurant des remboursements abusifs.</div>
             <div className="sub-features">
               {["Photos horodatées infalsifiables","Lecture automatique du # de commande","Détection d'anomalies par IA","Alertes en temps réel","Suivi de l'équipe","Employés illimités","Accès depuis tous les téléphones","Support prioritaire"].map(f => (
@@ -1160,7 +1160,7 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab }) {
               ))}
             </div>
             <button className="sub-btn" onClick={handleSubscribe} disabled={loading}>
-              {loading ? "Redirection..." : "S'abonner pour 20,99€ / mois →"}
+              {loading ? "Redirection..." : "S'abonner pour 14,99€ / mois →"}
             </button>
             <div className="sub-note">Résiliation possible à tout moment · Sans engagement</div>
           </div>
