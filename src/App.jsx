@@ -253,7 +253,8 @@ const INIT_DATA = {
   restaurants: []
 };
 const fmtDate = (iso) => {
-  const d = new Date(iso);
+  const normalized = iso.endsWith('Z') ? iso : iso + 'Z';
+  const d = new Date(normalized);
   const pad = n => String(n).padStart(2, '0');
   const offset = d.getTimezoneOffset() * -1;
   const local = new Date(d.getTime() + offset * 60000);
