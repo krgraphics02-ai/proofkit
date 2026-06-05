@@ -255,7 +255,9 @@ const INIT_DATA = {
 const fmtDate = (iso) => {
   const d = new Date(iso);
   const pad = n => String(n).padStart(2, '0');
-  return `${pad(d.getUTCDate())}/${pad(d.getUTCMonth()+1)}/${d.getUTCFullYear()} à ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}:${pad(d.getUTCSeconds())}`;
+  const offset = d.getTimezoneOffset() * -1;
+  const local = new Date(d.getTime() + offset * 60000);
+  return `${pad(local.getUTCDate())}/${pad(local.getUTCMonth()+1)}/${local.getUTCFullYear()} à ${pad(local.getUTCHours())}:${pad(local.getUTCMinutes())}:${pad(local.getUTCSeconds())}`;
 };
 const isoDay = (iso) => iso ? iso.slice(0, 10) : "";
 const statusInfo = (s) => {
