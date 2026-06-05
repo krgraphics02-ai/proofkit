@@ -967,21 +967,23 @@ const deleteRecord = async (id) => {
   try {
     const date = new Date(selected.timestamp).toISOString().slice(0,10);
     const src2 = selected.img_src_2 || selected.imgSrc2;
-    const JSZip = (await import('jszip')).default;
-    const zip = new JSZip();
-    const fetchImg = async (url) => {
+    const dl = async (url, filename) => {
       const res = await fetch(`/api/download?url=${encodeURIComponent(url)}&timestamp=${encodeURIComponent(selected.timestamp)}`);
-      return await res.blob();
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = blobUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(blobUrl);
     };
-    zip.file(`commande-${selected.order_number || "inconnu"}-${date}-1.jpg`, await fetchImg(selected.imgSrc));
-    if (src2) zip.file(`commande-${selected.order_number || "inconnu"}-${date}-2.jpg`, await fetchImg(src2));
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(zipBlob);
-    link.download = `commande-${selected.order_number || "inconnu"}-${date}.zip`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    await dl(selected.imgSrc, `commande-${selected.order_number || "inconnu"}-${date}.jpg`);
+    if (src2) {
+      await new Promise(r => setTimeout(r, 1000));
+      await dl(src2, `commande-${selected.order_number || "inconnu"}-${date}-2.jpg`);
+    }
   } catch(e) {
     alert("Erreur : " + e.message);
   }
