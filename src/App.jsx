@@ -758,7 +758,10 @@ const b64 = await toBase64(compressed);
 const fixedB64 = fixExifDate("data:image/jpeg;base64," + b64, timestamp);
 let uploadedUrl = null;
 try {
-  const fixedBlob = await (await fetch(fixedB64)).blob();
+  const byteString = atob(fixedB64.split(',')[1]);
+  const byteArray = new Uint8Array(byteString.length);
+  for (let i = 0; i < byteString.length; i++) byteArray[i] = byteString.charCodeAt(i);
+  const fixedBlob = new Blob([byteArray], { type: 'image/jpeg' });
   const fixedFile = new File([fixedBlob], imgFile.name, { type: 'image/jpeg' });
   uploadedUrl = await uploadToSupabase(fixedFile, timestamp);
 } catch(e) {
