@@ -1,5 +1,4 @@
 import piexif from 'piexifjs';
-
 export default async function handler(req, res) {
   try {
     const { url, timestamp } = req.query;
@@ -14,7 +13,9 @@ export default async function handler(req, res) {
       try {
         const dateObj = new Date(decodeURIComponent(timestamp));
         const pad = n => String(n).padStart(2, '0');
-        const exifDate = `${dateObj.getFullYear()}:${pad(dateObj.getMonth()+1)}:${pad(dateObj.getDate())} ${pad(dateObj.getHours())}:${pad(dateObj.getMinutes())}:${pad(dateObj.getSeconds())}`;
+        const offset = dateObj.getTimezoneOffset() * -1;
+        const local = new Date(dateObj.getTime() + offset * 60000);
+        const exifDate = `${local.getUTCFullYear()}:${pad(local.getUTCMonth()+1)}:${pad(local.getUTCDate())} ${pad(local.getUTCHours())}:${pad(local.getUTCMinutes())}:${pad(local.getUTCSeconds())}`;
         const exifObj = { "0th": {}, "Exif": {} };
         exifObj["0th"][piexif.ImageIFD.DateTime] = exifDate;
         exifObj["Exif"][piexif.ExifIFD.DateTimeOriginal] = exifDate;
