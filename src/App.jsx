@@ -979,8 +979,8 @@ const deleteRecord = async (id) => {
     };
     const date = new Date(selected.timestamp).toISOString().slice(0,10);
     await dl(selected.imgSrc, `commande-${selected.order_number || "inconnu"}-${date}.jpg`);
-    const src2 = selected.img_src_2 || selected.imgSrc2;
-    if (src2) await dl(src2, `commande-${selected.order_number || "inconnu"}-${date}-2.jpg`);
+   if (selected.img_src_2) await dl(selected.img_src_2, `commande-${selected.order_number || "inconnu"}-${date}-2.jpg`);
+    else if (selected.imgSrc2) await dl(selected.imgSrc2, `commande-${selected.order_number || "inconnu"}-${date}-2.jpg`);
   } catch(e) {
     alert("Erreur : " + e.message);
   }
