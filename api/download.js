@@ -13,8 +13,7 @@ export default async function handler(req, res) {
       try {
         const dateObj = new Date(decodeURIComponent(timestamp));
         const pad = n => String(n).padStart(2, '0');
-        const offset = dateObj.getTimezoneOffset() * -1;
-        const local = new Date(dateObj.getTime() + offset * 60000);
+        const local = new Date(dateObj.getTime() + 2 * 60 * 60000);
         const exifDate = `${local.getUTCFullYear()}:${pad(local.getUTCMonth()+1)}:${pad(local.getUTCDate())} ${pad(local.getUTCHours())}:${pad(local.getUTCMinutes())}:${pad(local.getUTCSeconds())}`;
         const exifObj = { "0th": {}, "Exif": {} };
         exifObj["0th"][piexif.ImageIFD.DateTime] = exifDate;
