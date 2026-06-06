@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from './supabase.js';
 import piexif from 'piexifjs';
-import posthog from 'posthog-js';
 
 /* ─── STYLES ─── */
 const makeStyles = (dark) => `
@@ -381,12 +380,9 @@ function LoginForm({ data, setData, onLogin }) {
         if (exists) return prev;
         return { ...prev, restaurants: [...prev.restaurants, restoObj] };
       });
-      posthog.identify(String(users.id), { name: users.name, role: users.role });
-      posthog.capture('user_logged_in', { role: users.role, restaurant_id: resto.id });
       onLogin({ type: "resto", restoId: resto.id, user: { id: users.id, email: users.email, name: users.name, role: users.role, username: users.email } });
       return;
     }
-    posthog.capture('login_failed');
     setError("Email ou mot de passe incorrect.");
   };
 
@@ -441,8 +437,6 @@ function RegisterForm({ data, setData, onLogin }) {
     const user = { id: userData.id, email: email.trim(), username: email.trim(), password, name: managerName, role: "manager" };
     const newResto = { id: restoData.id, name: restoName, emoji: "🍽️", subscribed: false, users: [user], records: [], alerts: [] };
     setData(prev => ({ ...prev, restaurants: [...prev.restaurants, newResto] }));
-    posthog.identify(String(userData.id), { name: managerName, role: 'manager' });
-    posthog.capture('restaurant_registered', { restaurant_id: restoData.id });
     fetch('/api/send-email', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -513,11 +507,21 @@ useEffect(() => {
 
   const toggleSub = async (id) => {
     const resto = data.restaurants.find(r => r.id === id);
-    await supabase.from('restaurants').update({ subscribed: !resto.subscribed }).eq('id', id);
-    posthog.capture('restaurant_subscription_toggled', { restaurant_id: id, subscribed: !resto.subscribed });
+    const newSubscribed = !resto.subscribed;
+    await supabase.from('restaurants').update({ subscribed: newSubscribed }).eq('id', id);
+    if (newSubscribed) {
+      const { data: users } = await supabase.from('users').select('*').eq('restaurant_id', id).eq('role', 'manager').single();
+      if (users) {
+        fetch('/api/send-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ type: 'subscription_activated', email: users.email, name: users.name, restoName: resto.name })
+        });
+      }
+    }
     setData(prev => ({
       ...prev,
-      restaurants: prev.restaurants.map(r => r.id === id ? { ...r, subscribed: !r.subscribed } : r)
+      restaurants: prev.restaurants.map(r => r.id === id ? { ...r, subscribed: newSubscribed } : r)
     }));
   };
 
@@ -542,7 +546,7 @@ const deleteResto = async (id) => {
           </div>
           <div className="nav-right">
             <button className="theme-btn" onClick={() => setDark(d => !d)}>{dark ? "☀️" : "🌙"}</button>
-            <button className="logout-btn" onClick={() => { posthog.reset(); onLogout(); }}>Déco</button>
+            <button className="logout-btn" onClick={onLogout}>Déco</button>
           </div>
         </nav>
         <main className="main">
@@ -666,7 +670,7 @@ if (usersData) updateResto(r => ({ ...r, users: usersData }));
           <div className="nav-right">
             <span className="user-name">{user.name}</span>
             <button className="theme-btn" onClick={() => setDark(d => !d)}>{dark ? "☀️" : "🌙"}</button>
-            <button className="logout-btn" onClick={() => { posthog.reset(); onLogout(); }}>Déco</button>
+            <button className="logout-btn" onClick={onLogout}>Déco</button>
           </div>
         </nav>
         <main className="main">
@@ -828,7 +832,6 @@ Si tu vois un code en gros caractères en haut, c'est FORCÉMENT le numéro de c
       const fixedImg = fixExifDate(imgSrc, timestamp);
 record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
     } catch(e) {
-      posthog.captureException(e, { context: 'proof_analysis' });
       record = { order_number: null, status: "warning", anomaly: "Erreur: " + e.message, items_detected: null, confidence: "low", timestamp, imgSrc };
     }
     const imgSrc2Url = imgFile2 ? (await uploadToSupabase(imgFile2, timestamp)) : null;
@@ -847,10 +850,6 @@ await supabase.from('records').insert([{
 }]);
 addRecord({ ...record, img_src_2: imgSrc2Url, imgSrc2: imgSrc2Url });
 if (!subscribed) setDailyCount(prev => prev + 1);
-    posthog.capture('proof_submitted', { status: record.status, confidence: record.confidence, has_second_photo: !!imgFile2 });
-    if (record.status !== 'ok') {
-      posthog.capture('proof_anomaly_detected', { status: record.status, confidence: record.confidence });
-    }
     setLoading(false); setDone(true);
     setTimeout(() => { setActiveTab("Preuves"); setImgSrc(null); setImgFile(null); setDone(false); }, 1200);
   };
@@ -931,7 +930,6 @@ function RecordsView({ records, setRecords, currentUser, dark }) {
 
 const deleteRecord = async (id) => {
   await supabase.from('records').delete().eq('id', id);
-  posthog.capture('record_deleted', { record_id: id });
   setRecords(prev => prev.filter(r => r.id !== id));
   setSelected(null);
 };
@@ -987,7 +985,6 @@ const deleteRecord = async (id) => {
               {selected.anomaly && <div className="result-row"><span className="result-row-label">Anomalie</span><span className="result-row-value" style={{ color: "var(--yellow)" }}>{selected.anomaly}</span></div>}
              <button className="modal-del-btn" style={{ background: "var(--blue-soft)", borderColor: "rgba(68,138,255,0.2)", color: "var(--blue)", marginTop: 8 }} onClick={async () => {
   try {
-    posthog.capture('proof_downloaded', { record_id: selected.id, status: selected.status });
     const date = new Date(selected.timestamp).toISOString().slice(0,10);
     const src2 = selected.img_src_2 || selected.imgSrc2;
     const dl = async (url, filename) => {
@@ -1102,10 +1099,7 @@ function AdminView({ users, setUsers, records, restoId, subscribed }) {
       name: newName, username: newUsername, email: newUsername,
       password: newPassword, role: newRole
     }]).select().single();
-    if (userData) {
-      setUsers(prev => [...prev, userData]);
-      posthog.capture('team_member_added', { role: newRole, restaurant_id: restoId });
-    }
+    if (userData) setUsers(prev => [...prev, userData]);
     setNewName(""); setNewUsername(""); setNewPassword(""); setNewRole("employee");
   };
 
@@ -1156,7 +1150,6 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab }) {
   const [loading, setLoading] = useState(false);
   const handleSubscribe = () => {
     setLoading(true);
-    posthog.capture('subscription_checkout_started');
     window.location.href = "https://buy.stripe.com/00w28jbx93kA1PV9zS1gs01";
   };
   return (
@@ -1172,7 +1165,7 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab }) {
             {[["Plan","ProofKit Pro"],["Prix","14,99€ / mois"],["Employés","Illimités"],["Preuves","Illimitées"],["Support","Email prioritaire"]].map(([k,v]) => (
               <div key={k} className="result-row"><span className="result-row-label">{k}</span><span className="result-row-value">{v}</span></div>
             ))}
-            <button className="modal-del-btn" onClick={() => { posthog.capture('subscription_cancelled'); setSubscribed(false); }}>Résilier l'abonnement</button>
+            <button className="modal-del-btn" onClick={() => setSubscribed(false)}>Résilier l'abonnement</button>
           </div>
         </>
       ) : (
