@@ -437,6 +437,11 @@ function RegisterForm({ data, setData, onLogin }) {
     const user = { id: userData.id, email: email.trim(), username: email.trim(), password, name: managerName, role: "manager" };
     const newResto = { id: restoData.id, name: restoName, emoji: "🍽️", subscribed: false, users: [user], records: [], alerts: [] };
     setData(prev => ({ ...prev, restaurants: [...prev.restaurants, newResto] }));
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: 'welcome', email: email.trim(), name: managerName, restoName })
+    });
     onLogin({ type: "resto", restoId: restoData.id, user });
     setLoading(false);
   };
