@@ -442,11 +442,6 @@ function RegisterForm({ data, setData, onLogin }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type: 'welcome', email: email.trim(), name: managerName, restoName })
     });
-    fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'welcome', email: email.trim(), name: managerName, restoName })
-    });
     onLogin({ type: "resto", restoId: restoData.id, user });
     setLoading(false);
   };
