@@ -7,11 +7,11 @@ const makeStyles = (dark) => `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inconsolata:wght@300;400;500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: ${dark ? "#0a0a0a" : "#f4f2ee"};
-    --surface: ${dark ? "#141414" : "#ffffff"};
-    --surface2: ${dark ? "#1c1c1c" : "#ede9e2"};
+    --bg: ${dark ? "#0d1117" : "#f4f6f9"};
+    --surface: ${dark ? "#161d27" : "#ffffff"};
+    --surface2: ${dark ? "#1a2332" : "#eef1f5"};
     --border: ${dark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.1)"};
-    --orange: #ff6b00; --orange-soft: rgba(255,107,0,0.1);
+    --orange: #00C27C; --orange-soft: rgba(0,194,124,0.1);
     --green: ${dark ? "#00e676" : "#00a152"}; --green-soft: rgba(0,230,118,0.1);
     --yellow: ${dark ? "#ffd600" : "#f9a825"}; --yellow-soft: rgba(255,214,0,0.1);
     --red: #ff1744; --red-soft: rgba(255,23,68,0.1);
@@ -325,7 +325,7 @@ function LoginScreen({ data, setData, onLogin, dark, setDark }) {
       <div className="login-wrap">
         <div className="login-box" style={{ maxWidth: 440 }}>
           <div className="login-logo">
-            <div className="login-icon">📸</div>
+            <img src="/logo.png" style={{ width: 40, height: 40, borderRadius: 10, objectFit: "contain", background: "#fff" }} />
             <div className="login-brand">Proof<span>Kit</span></div>
             <button className="theme-btn" style={{ marginLeft: "auto" }} onClick={() => setDark(d => !d)}>{dark ? "☀️" : "🌙"}</button>
           </div>
@@ -654,7 +654,7 @@ if (usersData) updateResto(r => ({ ...r, users: usersData }));
       <div className="app">
         <nav className="nav">
           <div className="nav-left">
-            <div className="nav-brand"><div className="brand-icon">📸</div><div className="brand-name">Proof<span>Kit</span></div></div>
+            <div className="nav-brand"><img src="/logo.png" style={{ width: 30, height: 30, borderRadius: 8, objectFit: "contain", background: "#fff" }} /><div className="brand-name">Proof<span>Kit</span></div></div>
             <span className="resto-name-badge">{resto.emoji} {resto.name}</span>
             <span className={`role-badge ${user.role === "manager" ? "role-manager" : "role-employee"}`}>{user.role === "manager" ? "Manager" : "Employé"}</span>
           </div>
