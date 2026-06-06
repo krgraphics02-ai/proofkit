@@ -15,7 +15,7 @@ export default async function handler(req, res) {
     }
     
     const { data, error } = await resend.emails.send({
-      from: 'ProofKit <onboarding@resend.dev>',
+      from: 'ProofKit <hello@proofkit.fr>',
       to: email,
       subject,
       html,
