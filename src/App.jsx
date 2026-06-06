@@ -879,7 +879,7 @@ if (!subscribed && currentUser.role !== "manager") return (
           <div className="upload-sub">ou glisser une image ici</div>
         </div>
         <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
-          <label style={{ width: 80, height: 80, borderRadius: "50%", background: "var(--orange)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 4px 24px rgba(0,194,124,0.5)" border: "5px solid rgba(255,255,255,0.15)", transition: "transform 0.15s" }}>
+          <label style={{ width: 80, height: 80, borderRadius: "50%", background: "var(--orange)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", boxShadow: "0 4px 24px rgba(0,194,124,0.5)", border:"5px solid rgba(255,255,255,0.15)", transition: "transform 0.15s" }}>
             <input type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
             <span style={{ fontSize: 36 }}>📷</span>
           </label>
