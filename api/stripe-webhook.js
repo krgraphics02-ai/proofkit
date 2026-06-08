@@ -20,11 +20,16 @@ export default async function handler(req, res) {
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
       const obj = event.data.object;
-      const customerId = obj.customer;
-      if (customerId) {
-        const customer = await stripe.customers.retrieve(customerId);
-        if (customer.email) {
-          await supabase.from('restaurants').update({ subscribed: false }).eq('email', customer.email);
+      const restoId = obj.metadata?.restoId;
+      if (restoId) {
+        await supabase.from('restaurants').update({ subscribed: false }).eq('id', restoId);
+      } else {
+        const customerId = obj.customer;
+        if (customerId) {
+          const customer = await stripe.customers.retrieve(customerId);
+          if (customer.email) {
+            await supabase.from('restaurants').update({ subscribed: false }).eq('email', customer.email);
+          }
         }
       }
     } catch(e) {
