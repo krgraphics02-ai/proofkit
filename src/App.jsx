@@ -296,16 +296,6 @@ useEffect(() => {
 
   const resto = data.restaurants.find(r => r.id === session.restoId);
 
-useEffect(() => {
-  if (session?.restoId && resto) {
-    supabase.from('restaurants').select('subscribed').eq('id', session.restoId).single().then(({ data: r }) => {
-      if (r && r.subscribed !== resto.subscribed) {
-        updateResto(session.restoId, prev => ({ ...prev, subscribed: r.subscribed }));
-      }
-    });
-  }
-}, []);
-
 if (!resto && session.restoId) {
   supabase.from('restaurants').select('*').eq('id', session.restoId).single().then(({ data: r }) => {
     if (r) {
@@ -390,6 +380,13 @@ function LoginForm({ data, setData, onLogin }) {
         const exists = prev.restaurants.find(r => r.id === resto.id);
         if (exists) return prev;
         return { ...prev, restaurants: [...prev.restaurants, restoObj] };
+      });
+      const { data: freshResto } = await supabase.from('restaurants').select('subscribed').eq('id', resto.id).single();
+      const restoObjFresh = { ...restoObj, subscribed: freshResto ? freshResto.subscribed : resto.subscribed };
+      setData(prev => {
+        const exists = prev.restaurants.find(r => r.id === resto.id);
+        if (exists) return prev;
+        return { ...prev, restaurants: [...prev.restaurants, restoObjFresh] };
       });
       onLogin({ type: "resto", restoId: resto.id, user: { id: users.id, email: users.email, name: users.name, role: users.role, username: users.email } });
       return;
