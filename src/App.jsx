@@ -298,9 +298,11 @@ useEffect(() => {
 
 useEffect(() => {
   if (!session?.restoId) return;
+  const restoId = session.restoId;
   const refresh = () => {
-    supabase.from('restaurants').select('subscribed').eq('id', session.restoId).single().then(({ data: r }) => {
-      if (r) updateResto(session.restoId, prev => ({ ...prev, subscribed: r.subscribed }));
+    if (!localStorage.getItem('proofkit_session')) return;
+    supabase.from('restaurants').select('subscribed').eq('id', restoId).single().then(({ data: r }) => {
+      if (r) updateResto(restoId, prev => ({ ...prev, subscribed: r.subscribed }));
     });
   };
   refresh();
