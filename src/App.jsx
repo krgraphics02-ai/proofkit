@@ -1184,7 +1184,10 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab, user }) {
             {[["Plan","ProofKit Pro"],["Prix","14,99€ / mois"],["Employés","Illimités"],["Preuves","Illimitées"],["Support","Email prioritaire"]].map(([k,v]) => (
               <div key={k} className="result-row"><span className="result-row-label">{k}</span><span className="result-row-value">{v}</span></div>
             ))}
-            <button className="modal-del-btn" onClick={() => setSubscribed(false)}>Résilier l'abonnement</button>
+            <button className="modal-del-btn" onClick={async () => {
+              await supabase.from('restaurants').update({ subscribed: false }).eq('email', user?.email || '');
+              setSubscribed(false);
+            }}>Résilier l'abonnement</button>
           </div>
         </>
       ) : (
