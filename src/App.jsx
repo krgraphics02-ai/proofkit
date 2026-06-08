@@ -289,14 +289,7 @@ useEffect(() => {
     }));
   };
 
-  if (!session) return <LoginScreen data={data} setData={setData} onLogin={setSession} dark={dark} setDark={setDark} />;
-  if (session.type === "superadmin") return (
-    <SuperAdminPanel data={data} setData={setData} onLogout={() => setSession(null)} dark={dark} setDark={setDark} />
-  );
-
-  const resto = data.restaurants.find(r => r.id === session.restoId);
-
-useEffect(() => {
+  useEffect(() => {
   if (!session?.restoId) return;
   const restoId = session.restoId;
   const refresh = () => {
@@ -309,6 +302,13 @@ useEffect(() => {
   document.addEventListener('visibilitychange', refresh);
   return () => document.removeEventListener('visibilitychange', refresh);
 }, [session?.restoId]);
+
+  if (!session) return <LoginScreen data={data} setData={setData} onLogin={setSession} dark={dark} setDark={setDark} />;
+  if (session.type === "superadmin") return (
+    <SuperAdminPanel data={data} setData={setData} onLogout={() => setSession(null)} dark={dark} setDark={setDark} />
+  );
+
+  const resto = data.restaurants.find(r => r.id === session.restoId);
 
 if (!resto && session?.restoId) {
   supabase.from('restaurants').select('*').eq('id', session.restoId).single().then(({ data: r }) => {
