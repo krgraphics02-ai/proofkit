@@ -15,6 +15,23 @@ export default async function handler(req, res) {
   } catch (e) {
     return res.status(400).json({ error: e.message });
   }
+  if (event.type === 'invoice.payment_failed' || event.type === 'customer.subscription.deleted') {
+    try {
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+      const obj = event.data.object;
+      const customerId = obj.customer;
+      if (customerId) {
+        const customer = await stripe.customers.retrieve(customerId);
+        if (customer.email) {
+          await supabase.from('restaurants').update({ subscribed: false }).eq('email', customer.email);
+        }
+      }
+    } catch(e) {
+      console.error('Webhook payment_failed error:', e);
+    }
+  }
+
   if (event.type === 'checkout.session.completed' || event.type === 'customer.subscription.created' || event.type === 'invoice.payment_succeeded') {
     try {
       const { createClient } = await import('@supabase/supabase-js');
