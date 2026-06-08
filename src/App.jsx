@@ -297,11 +297,16 @@ useEffect(() => {
   const resto = data.restaurants.find(r => r.id === session.restoId);
 
 useEffect(() => {
-  if (session?.restoId) {
-    supabase.from('restaurants').select('subscribed').eq('id', session.restoId).single().then(({ data: r }) => {
-      if (r) updateResto(session.restoId, prev => ({ ...prev, subscribed: r.subscribed }));
-    });
-  }
+  const refresh = () => {
+    if (session?.restoId) {
+      supabase.from('restaurants').select('subscribed').eq('id', session.restoId).single().then(({ data: r }) => {
+        if (r) updateResto(session.restoId, prev => ({ ...prev, subscribed: r.subscribed }));
+      });
+    }
+  };
+  refresh();
+  document.addEventListener('visibilitychange', refresh);
+  return () => document.removeEventListener('visibilitychange', refresh);
 }, [session?.restoId]);
 
 if (!resto && session.restoId) {
