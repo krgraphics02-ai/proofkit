@@ -1167,9 +1167,16 @@ await supabase.from('users').delete().eq('id', u.id);
 /* ─── SUBSCRIPTION VIEW ─── */
 function SubscriptionView({ subscribed, setSubscribed, setActiveTab, user, restoId }) {
   const [loading, setLoading] = useState(false);
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     setLoading(true);
-    window.location.href = "https://buy.stripe.com/00w28jbx93kA1PV9zS1gs01?prefilled_email=" + encodeURIComponent(user?.email || "");
+    const res = await fetch('/api/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: user?.email, restoId })
+    });
+    const data = await res.json();
+    if (data.url) window.location.href = data.url;
+    else { alert('Erreur. Réessaie.'); setLoading(false); }
   };
   return (
     <div className="sub-wrap">

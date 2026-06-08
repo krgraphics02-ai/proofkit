@@ -37,26 +37,34 @@ export default async function handler(req, res) {
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
       const obj = event.data.object;
-      const emailsToTry = [];
-      if (obj.customer_details?.email) emailsToTry.push(obj.customer_details.email);
-      if (obj.customer_email) emailsToTry.push(obj.customer_email);
-      if (obj.customer) {
-        const customer = await stripe.customers.retrieve(obj.customer);
-        if (customer.email) emailsToTry.push(customer.email);
+      const restoId = obj.metadata?.restoId || obj.subscription_data?.metadata?.restoId;
+      let resto = null;
+      if (restoId) {
+        const { data } = await supabase.from('restaurants').select('*').eq('id', restoId).single();
+        resto = data;
       }
-      for (const email of [...new Set(emailsToTry)]) {
-        const { data: resto } = await supabase.from('restaurants').select('*').eq('email', email).single();
-        if (resto) {
-          await supabase.from('restaurants').update({ subscribed: true }).eq('id', resto.id);
-          const { data: user } = await supabase.from('users').select('*').eq('restaurant_id', resto.id).eq('role', 'manager').single();
-          if (user) {
-            await fetch('https://proofkit.fr/api/send-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ type: 'subscription_activated', email: user.email, name: user.name, restoName: resto.name })
-            });
-          }
-          break;
+      if (!resto) {
+        const emailsToTry = [];
+        if (obj.customer_details?.email) emailsToTry.push(obj.customer_details.email);
+        if (obj.customer_email) emailsToTry.push(obj.customer_email);
+        if (obj.customer) {
+          const customer = await stripe.customers.retrieve(obj.customer);
+          if (customer.email) emailsToTry.push(customer.email);
+        }
+        for (const email of [...new Set(emailsToTry)]) {
+          const { data } = await supabase.from('restaurants').select('*').eq('email', email).single();
+          if (data) { resto = data; break; }
+        }
+      }
+      if (resto) {
+        await supabase.from('restaurants').update({ subscribed: true }).eq('id', resto.id);
+        const { data: user } = await supabase.from('users').select('*').eq('restaurant_id', resto.id).eq('role', 'manager').single();
+        if (user) {
+          await fetch('https://proofkit.fr/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ type: 'subscription_activated', email: user.email, name: user.name, restoName: resto.name })
+          });
         }
       }
     } catch(e) {
