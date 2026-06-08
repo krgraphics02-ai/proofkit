@@ -697,7 +697,7 @@ subscribed={resto.subscribed} setActiveTab={setActiveTab} />}
           {activeTab === "Alertes" && <AlertsView alerts={resto.alerts} dismissAlert={dismissAlert} currentUser={user} />}
           {activeTab === "Équipe" && user.role === "manager" && <TeamView users={resto.users} records={resto.records} />}
          {activeTab === "Admin" && user.role === "manager" && <AdminView users={resto.users} setUsers={setUsers} records={resto.records} restoId={resto.id} subscribed={resto.subscribed} />}
-          {activeTab === "Abonnement" && user.role === "manager" && <SubscriptionView subscribed={resto.subscribed} setSubscribed={setSubscribed} setActiveTab={setActiveTab} user={user} />}
+          {activeTab === "Abonnement" && user.role === "manager" && <SubscriptionView subscribed={resto.subscribed} setSubscribed={setSubscribed} setActiveTab={setActiveTab} user={user} restoId={resto.id} />}
         </main>
         {activeTab !== "Capturer" && activeTab !== "Admin" && activeTab !== "Abonnement" && (
           <div style={{ position: "fixed", bottom: 32, left: "50%", transform: "translateX(-50%)", zIndex: 150 }}>
@@ -1165,7 +1165,7 @@ await supabase.from('users').delete().eq('id', u.id);
 }
 
 /* ─── SUBSCRIPTION VIEW ─── */
-function SubscriptionView({ subscribed, setSubscribed, setActiveTab, user }) {
+function SubscriptionView({ subscribed, setSubscribed, setActiveTab, user, restoId }) {
   const [loading, setLoading] = useState(false);
   const handleSubscribe = () => {
     setLoading(true);
@@ -1185,7 +1185,7 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab, user }) {
               <div key={k} className="result-row"><span className="result-row-label">{k}</span><span className="result-row-value">{v}</span></div>
             ))}
             <button className="modal-del-btn" onClick={async () => {
-              await supabase.from('restaurants').update({ subscribed: false }).eq('email', user?.email || '');
+              await supabase.from('restaurants').update({ subscribed: false }).eq('id', restoId);
               setSubscribed(false);
             }}>Résilier l'abonnement</button>
           </div>
