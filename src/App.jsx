@@ -296,6 +296,14 @@ useEffect(() => {
 
   const resto = data.restaurants.find(r => r.id === session.restoId);
 
+useEffect(() => {
+  if (session?.restoId) {
+    supabase.from('restaurants').select('subscribed').eq('id', session.restoId).single().then(({ data: r }) => {
+      if (r) updateResto(session.restoId, prev => ({ ...prev, subscribed: r.subscribed }));
+    });
+  }
+}, [session?.restoId]);
+
 if (!resto && session.restoId) {
   supabase.from('restaurants').select('*').eq('id', session.restoId).single().then(({ data: r }) => {
     if (r) {
