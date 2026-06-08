@@ -20,7 +20,11 @@ export default async function handler(req, res) {
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
       const obj = event.data.object;
-      const restoId = obj.metadata?.restoId;
+      let restoId = obj.metadata?.restoId;
+      if (!restoId && obj.subscription) {
+        const sub = await stripe.subscriptions.retrieve(obj.subscription);
+        restoId = sub.metadata?.restoId;
+      }
       if (restoId) {
         await supabase.from('restaurants').update({ subscribed: false }).eq('id', restoId);
       } else {
@@ -42,7 +46,11 @@ export default async function handler(req, res) {
       const { createClient } = await import('@supabase/supabase-js');
       const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
       const obj = event.data.object;
-      const restoId = obj.metadata?.restoId || obj.subscription_data?.metadata?.restoId;
+      let restoId = obj.metadata?.restoId;
+      if (!restoId && obj.subscription) {
+        const sub = await stripe.subscriptions.retrieve(obj.subscription);
+        restoId = sub.metadata?.restoId;
+      }
       let resto = null;
       if (restoId) {
         const { data } = await supabase.from('restaurants').select('*').eq('id', restoId).single();
