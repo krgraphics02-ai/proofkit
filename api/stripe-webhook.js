@@ -2,21 +2,29 @@ import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
 
   const sig = req.headers['stripe-signature'];
   let event;
+  let rawBody = '';
+
+  await new Promise((resolve, reject) => {
+    req.on('data', chunk => rawBody += chunk);
+    req.on('end', resolve);
+    req.on('error', reject);
+  });
 
   try {
-    const rawBody = await new Promise((resolve, reject) => {
-      let data = '';
-      req.on('data', chunk => data += chunk);
-      req.on('end', () => resolve(data));
-      req.on('error', reject);
-    });
     event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (e) {
+    console.error('Webhook signature error:', e.message);
     return res.status(400).json({ error: e.message });
   }
 
@@ -40,7 +48,7 @@ export default async function handler(req, res) {
         }
       }
     } catch(e) {
-      console.error('Webhook error:', e);
+      console.error('Webhook processing error:', e);
     }
   }
 
