@@ -824,13 +824,13 @@ PRIORITÉ ABSOLUE — trouve le numéro de commande :
 - Code alphanumérique court en évidence en haut du ticket
 - IGNORE "OF XX" ou "OF XXX" — ce n'est jamais le numéro de commande
 - Lis attentivement même si la photo est de travers ou froissée
-Si tu vois un code alphanumérique 5 caractères, c'est FORCÉMENT le numéro de commande. }
+Si tu vois un code alphanumérique 5 caractères, c'est FORCÉMENT le numéro de commande.` }
           ]}]
         })
       });
       const data = await res.json();
       const text = data.content?.map(b => b.text || "").join("") || "{}";
-      const parsed = JSON.parse(text.replace(/```json|```/g, "").trim());
+      const parsed = JSON.parse(text.replace(/```json/g, "").replace(/```/g, "").trim());
       const fixedImg = fixExifDate(imgSrc, timestamp);
 record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
     } catch(e) {
