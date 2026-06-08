@@ -308,7 +308,7 @@ useEffect(() => {
   return () => document.removeEventListener('visibilitychange', refresh);
 }, [session?.restoId]);
 
-if (!resto && session.restoId) {
+if (!resto && session?.restoId) {
   supabase.from('restaurants').select('*').eq('id', session.restoId).single().then(({ data: r }) => {
     if (r) {
       setData(prev => ({ ...prev, restaurants: [...prev.restaurants, { id: r.id, name: r.name, emoji: "🍽️", subscribed: r.subscribed, users: [], records: [], alerts: [] }] }));
@@ -316,7 +316,7 @@ if (!resto && session.restoId) {
       setSession(null);
     }
   });
-  return null;
+  return <LoginScreen data={data} setData={setData} onLogin={setSession} dark={dark} setDark={setDark} />;
 }
   return (
     <RestoApp
