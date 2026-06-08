@@ -1185,8 +1185,14 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab, user, resto
               <div key={k} className="result-row"><span className="result-row-label">{k}</span><span className="result-row-value">{v}</span></div>
             ))}
             <button className="modal-del-btn" onClick={async () => {
-              await supabase.from('restaurants').update({ subscribed: false }).eq('id', restoId);
-              setSubscribed(false);
+              if (!confirm('Confirmer la résiliation ? Vous perdrez accès immédiatement.')) return;
+              const res = await fetch('/api/cancel-subscription', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user?.email, restoId })
+              });
+              if (res.ok) setSubscribed(false);
+              else alert('Erreur lors de la résiliation. Contactez le support.');
             }}>Résilier l'abonnement</button>
           </div>
         </>
