@@ -1,56 +1,50 @@
 import Stripe from 'stripe';
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
-
   const sig = req.headers['stripe-signature'];
   let event;
   let rawBody = '';
-
   await new Promise((resolve, reject) => {
     req.on('data', chunk => rawBody += chunk);
     req.on('end', resolve);
     req.on('error', reject);
   });
-
   try {
     event = stripe.webhooks.constructEvent(rawBody, sig, process.env.STRIPE_WEBHOOK_SECRET);
   } catch (e) {
-    console.error('Webhook signature error:', e.message);
     return res.status(400).json({ error: e.message });
   }
-
-  if (event.type === 'customer.subscription.created' || event.type === 'invoice.payment_succeeded') {
-    const customerId = event.data.object.customer;
+  if (event.type === 'checkout.session.completed' || event.type === 'customer.subscription.created' || event.type === 'invoice.payment_succeeded') {
     try {
-      const customer = await stripe.customers.retrieve(customerId);
-      const email = customer.email;
-      if (email) {
-        const { createClient } = await import('@supabase/supabase-js');
-        const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
-        await supabase.from('restaurants').update({ subscribed: true }).eq('email', email);
-        const { data: user } = await supabase.from('users').select('*').eq('email', email).eq('role', 'manager').single();
+      const { createClient } = await import('@supabase/supabase-js');
+      const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+      const obj = event.data.object;
+      const emailsToTry = [];
+      if (obj.customer_details?.email) emailsToTry.push(obj.customer_details.email);
+      if (obj.customer_email) emailsToTry.push(obj.customer_email);
+      if (obj.customer) {
+        const customer = await stripe.customers.retrieve(obj.customer);
+        if (customer.email) emailsToTry.push(customer.email);
+      }
+      for (const email of [...new Set(emailsToTry)]) {
         const { data: resto } = await supabase.from('restaurants').select('*').eq('email', email).single();
-        if (user && resto) {
-          await fetch('https://proofkit.fr/api/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ type: 'subscription_activated', email: user.email, name: user.name, restoName: resto.name })
-          });
+        if (resto) {
+          await supabase.from('restaurants').update({ subscribed: true }).eq('id', resto.id);
+          const { data: user } = await supabase.from('users').select('*').eq('restaurant_id', resto.id).eq('role', 'manager').single();
+          if (user) {
+            await fetch('https://proofkit.fr/api/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ type: 'subscription_activated', email: user.email, name: user.name, restoName: resto.name })
+            });
+          }
+          break;
         }
       }
     } catch(e) {
-      console.error('Webhook processing error:', e);
+      console.error('Webhook error:', e);
     }
   }
-
   res.status(200).json({ received: true });
 }
