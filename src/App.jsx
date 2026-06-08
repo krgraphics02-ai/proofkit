@@ -820,9 +820,11 @@ PRIORITÉ ABSOLUE — trouve le numéro de commande :
 - Sur Uber Eats français : code 5 caractères en GROS dans un rectangle noir en haut (ex: DD31E, 9EE80, AB12C)
 - Avec un # devant en gros caractères (ex: #255D5, #9E273) — retourne le numéro SANS le #, donc "255D5" et non "#255D5"
 - "Order # XXXXXX" ou "Uber Eats #XXXXX"
+- Code alphanumérique 5 caractères mélangant lettres et chiffres juste sous le numéro de téléphone (ex: 68F37, AB12C) — c'est CE code qui est le numéro de commande, pas "OF 23" qui est un numéro d'ordre interne
 - Code alphanumérique court en évidence en haut du ticket
+- IGNORE "OF XX" ou "OF XXX" — ce n'est jamais le numéro de commande
 - Lis attentivement même si la photo est de travers ou froissée
-Si tu vois un code en gros caractères en haut, c'est FORCÉMENT le numéro de commande.` }
+Si tu vois un code alphanumérique 5 caractères, c'est FORCÉMENT le numéro de commande. }
           ]}]
         })
       });
