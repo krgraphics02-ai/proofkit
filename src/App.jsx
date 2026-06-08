@@ -295,6 +295,17 @@ useEffect(() => {
   );
 
   const resto = data.restaurants.find(r => r.id === session.restoId);
+
+useEffect(() => {
+  if (session?.restoId && resto) {
+    supabase.from('restaurants').select('subscribed').eq('id', session.restoId).single().then(({ data: r }) => {
+      if (r && r.subscribed !== resto.subscribed) {
+        updateResto(session.restoId, prev => ({ ...prev, subscribed: r.subscribed }));
+      }
+    });
+  }
+}, []);
+
 if (!resto && session.restoId) {
   supabase.from('restaurants').select('*').eq('id', session.restoId).single().then(({ data: r }) => {
     if (r) {
