@@ -376,11 +376,6 @@ function LoginForm({ data, setData, onLogin }) {
         id: resto.id, name: resto.name, emoji: "🍽️",
         subscribed: resto.subscribed, users: [], records: [], alerts: []
       };
-      setData(prev => {
-        const exists = prev.restaurants.find(r => r.id === resto.id);
-        if (exists) return prev;
-        return { ...prev, restaurants: [...prev.restaurants, restoObj] };
-      });
       const { data: freshResto } = await supabase.from('restaurants').select('subscribed').eq('id', resto.id).single();
       const restoObjFresh = { ...restoObj, subscribed: freshResto ? freshResto.subscribed : resto.subscribed };
       setData(prev => {
