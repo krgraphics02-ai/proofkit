@@ -696,7 +696,7 @@ subscribed={resto.subscribed} setActiveTab={setActiveTab} />}
           {activeTab === "Alertes" && <AlertsView alerts={resto.alerts} dismissAlert={dismissAlert} currentUser={user} />}
           {activeTab === "Équipe" && user.role === "manager" && <TeamView users={resto.users} records={resto.records} />}
          {activeTab === "Admin" && user.role === "manager" && <AdminView users={resto.users} setUsers={setUsers} records={resto.records} restoId={resto.id} subscribed={resto.subscribed} />}
-          {activeTab === "Abonnement" && user.role === "manager" && <SubscriptionView subscribed={resto.subscribed} setSubscribed={setSubscribed} setActiveTab={setActiveTab} />}
+          {activeTab === "Abonnement" && user.role === "manager" && <SubscriptionView subscribed={resto.subscribed} setSubscribed={setSubscribed} setActiveTab={setActiveTab} user={user} />}
         </main>
         {activeTab !== "Capturer" && activeTab !== "Admin" && activeTab !== "Abonnement" && (
           <div style={{ position: "fixed", bottom: 32, left: "50%", transform: "translateX(-50%)", zIndex: 150 }}>
@@ -1164,11 +1164,11 @@ await supabase.from('users').delete().eq('id', u.id);
 }
 
 /* ─── SUBSCRIPTION VIEW ─── */
-function SubscriptionView({ subscribed, setSubscribed, setActiveTab }) {
+function SubscriptionView({ subscribed, setSubscribed, setActiveTab, user }) {
   const [loading, setLoading] = useState(false);
   const handleSubscribe = () => {
     setLoading(true);
-    window.location.href = "https://buy.stripe.com/00w28jbx93kA1PV9zS1gs01";
+    window.location.href = "https://buy.stripe.com/00w28jbx93kA1PV9zS1gs01?prefilled_email=" + encodeURIComponent(user?.email || "");
   };
   return (
     <div className="sub-wrap">
