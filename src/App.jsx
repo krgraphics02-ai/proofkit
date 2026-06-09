@@ -117,7 +117,7 @@ const makeStyles = (dark) => `
   .preview-img { width: 100%; max-height: 300px; object-fit: contain; display: block; }
   .preview-change { position: absolute; bottom: 12px; right: 12px; padding: 8px 14px; background: rgba(0,0,0,0.7); border: 1px solid var(--border); border-radius: 8px; color: #fff; font-family: 'Syne', sans-serif; font-size: 12px; cursor: pointer; }
   .send-btn { width: 100%; padding: 16px; background: var(--orange); border: none; border-radius: 12px; color: #fff; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-bottom: 24px; }
-  .send-btn:hover:not(:disabled) { background: #ff8c00; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,194,124,0.3); }
+  .send-btn:hover:not(:disabled) { background: #00a366;transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,194,124,0.3); }
   .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .loading-bar { width: 100%; height: 3px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-bottom: 12px; }
   .loading-bar-inner { height: 100%; background: var(--orange); border-radius: 3px; animation: loadbar 1.5s ease-in-out infinite; }
