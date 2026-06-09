@@ -1108,6 +1108,7 @@ function TeamView({ users, records }) {
 function AdminView({ users, setUsers, records, restoId, subscribed }) {
   const [newName, setNewName] = useState("");
   const [newUsername, setNewUsername] = useState("");
+  const [newEmail, setNewEmail] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [newRole, setNewRole] = useState("employee");
 
@@ -1115,11 +1116,11 @@ function AdminView({ users, setUsers, records, restoId, subscribed }) {
     if (!newName || !newUsername || !newPassword) return;
     const { data: userData } = await supabase.from('users').insert([{
       restaurant_id: restoId,
-      name: newName, username: newUsername, email: newUsername,
+      name: newName, username: newUsername, email: newEmail,
       password: newPassword, role: newRole
     }]).select().single();
     if (userData) setUsers(prev => [...prev, userData]);
-    setNewName(""); setNewUsername(""); setNewPassword(""); setNewRole("employee");
+    setNewName(""); setNewUsername(""); setNewEmail(""); setNewPassword(""); setNewRole("employee");
   };
 
   return (
@@ -1150,14 +1151,15 @@ await supabase.from('users').delete().eq('id', u.id);
         <div className="section-title">Ajouter un compte</div>
         <div className="form-grid">
           <input className="form-input" placeholder="Prénom" value={newName} onChange={e => setNewName(e.target.value)} />
-          <input className="form-input" placeholder="Identifiant" value={newUsername} onChange={e => setNewUsername(e.target.value)} />
+          <input className="form-input" placeholder="Email" value={newEmail} onChange={e => setNewEmail(e.target.value)} />
+          <input className="form-input" placeholder="Identifiant (affiché dans l'app)" value={newUsername} onChange={e => setNewUsername(e.target.value)} />
           <input className="form-input" placeholder="Mot de passe" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
           <select className="form-select" value={newRole} onChange={e => setNewRole(e.target.value)}>
             <option value="employee">Employé</option>
             <option value="manager">Manager</option>
           </select>
         </div>
-<button className="add-btn" onClick={addUser} disabled={!newName || !newUsername || !newPassword || !subscribed}>+ Ajouter</button>
+<button className="add-btn" onClick={addUser} disabled={!newName || !newEmail || !newUsername || !newPassword || !subscribed}>+ Ajouter</button>
 {!subscribed && <div style={{marginTop: 8, fontSize: 12, color: "var(--red)"}}>🔒 Abonnement requis pour ajouter des employés</div>}
       </div>
     </>
