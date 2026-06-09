@@ -70,7 +70,7 @@ export default async function handler(req, res) {
         }
       }
       if (resto) {
-        await supabase.from('restaurants').update({ subscribed: true }).eq('id', resto.id);
+        await supabase.from('restaurants').update({ subscribed: true, trial_used: true }).eq('id', resto.id);
         const { data: user } = await supabase.from('users').select('*').eq('restaurant_id', resto.id).eq('role', 'manager').single();
         if (user) {
           await fetch('https://proofkit.fr/api/send-email', {
