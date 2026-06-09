@@ -38,7 +38,7 @@ const makeStyles = (dark) => `
   .field input:focus { border-color: var(--orange); }
   .field input::placeholder { color: var(--text-muted); }
   .login-btn { width: 100%; padding: 15px; background: var(--orange); border: none; border-radius: 12px; color: #fff; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; margin-top: 8px; }
-  .login-btn:hover { background: #ff8c00; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,194,124,0.3); }
+  .login-btn:hover { background: #00a366; transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,194,124,0.3); }
   .login-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
   .login-error { background: var(--red-soft); border: 1px solid rgba(255,23,68,0.2); border-radius: 10px; padding: 12px 16px; font-size: 13px; color: var(--red); margin-bottom: 16px; }
 
@@ -214,7 +214,7 @@ const makeStyles = (dark) => `
   .sub-feature { display: flex; align-items: center; gap: 10px; font-size: 14px; }
   .sub-feature-icon { width: 22px; height: 22px; background: var(--green-soft); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; }
   .sub-btn { width: 100%; padding: 16px; background: var(--orange); border: none; border-radius: 12px; color: #fff; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
-  .sub-btn:hover { background: #ff8c00; transform: translateY(-1px); }
+  .sub-btn:hover { background: #00a366; transform: translateY(-1px); }
   .sub-note { text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 12px; }
   .sub-inactive-banner { background: var(--orange-soft); border: 1px solid rgba(0,194,124,0.3); border-radius: 14px; padding: 16px 20px; margin-bottom: 24px; font-size: 14px; display: flex; gap: 12px; align-items: flex-start; }
   .modal-del-btn { width: 100%; margin-top: 16px; padding: 12px; background: var(--red-soft); border: 1px solid rgba(255,23,68,0.2); border-radius: 10px; color: var(--red); font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
