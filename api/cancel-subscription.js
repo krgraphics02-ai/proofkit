@@ -6,12 +6,16 @@ export default async function handler(req, res) {
   const { restoId } = req.body;
   if (!restoId) return res.status(400).json({ error: 'restoId requis' });
   try {
-    const subscriptions = await stripe.subscriptions.list({ limit: 100 });
-    const sub = subscriptions.data.find(s => s.metadata?.restoId === restoId);
-    if (!sub) return res.status(404).json({ error: 'Abonnement non trouvé' });
-    await stripe.subscriptions.cancel(sub.id);
     const { createClient } = await import('@supabase/supabase-js');
     const supabase = createClient(process.env.VITE_SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    let sub = null;
+    for (const status of ['active', 'trialing', 'past_due']) {
+      const subs = await stripe.subscriptions.list({ limit: 100, status });
+      sub = subs.data.find(s => s.metadata?.restoId === restoId);
+      if (sub) break;
+    }
+    if (!sub) return res.status(404).json({ error: 'Abonnement non trouvé' });
+    await stripe.subscriptions.cancel(sub.id);
     await supabase.from('restaurants').update({ subscribed: false }).eq('id', restoId);
     res.status(200).json({ success: true });
   } catch(e) {
