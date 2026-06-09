@@ -1115,7 +1115,7 @@ function AdminView({ users, setUsers, records, restoId, subscribed }) {
   const addUser = async () => {
     if (!newName || !newUsername || !newPassword) return;
     const { data: existing } = await supabase.from('users').select('id').eq('email', newEmail.trim()).maybeSingle();
-    if (existing) { alert('Cet email est déjà utilisé.'); return; }
+    if (existing) { alert("L'email doit être différent de celui du restaurant."); return; }
     const { data: userData } = await supabase.from('users').insert([{
       restaurant_id: restoId,
       name: newName, username: newUsername, email: newEmail,
