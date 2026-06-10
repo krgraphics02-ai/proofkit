@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
 if (type === 'subscription_cancelled') {
       subject = 'Votre abonnement ProofKit a \u00e9t\u00e9 r\u00e9sili\u00e9';
-      html = '<div style="font-family:sans-serif;max-width:600px;margin:0 auto"><h1 style="color:#1a2332">Votre abonnement a \u00e9t\u00e9 r\u00e9sili\u00e9</h1><p>Bonjour <strong>' + name + '</strong>,</p><p>Votre abonnement ProofKit Pro pour <strong>' + restoName + '</strong> a bien \u00e9t\u00e9 r\u00e9sili\u00e9.</p><p>Vous pouvez vous r\u00e9abonner \u00e0 tout moment sur <a href="https://proofkit.fr">proofkit.fr</a>.</p><p style="margin-top:32px;color:#999;font-size:13px">Merci d\'avoir utilis\u00e9 ProofKit.</p></div>';
+      html = '<div style="font-family:sans-serif;max-width:600px;margin:0 auto"><h1 style="color:#00C27C">Votre abonnement a \u00e9t\u00e9 r\u00e9sili\u00e9</h1><p>Bonjour <strong>' + name + '</strong>,</p><p>Votre abonnement ProofKit Pro pour <strong>' + restoName + '</strong> a bien \u00e9t\u00e9 r\u00e9sili\u00e9.</p><p>Vous pouvez vous r\u00e9abonner \u00e0 tout moment sur <a href="https://proofkit.fr">proofkit.fr</a>.</p><p style="margin-top:32px;color:#999;font-size:13px">Merci d\'avoir utilis\u00e9 ProofKit.</p></div>';
     }
     if (type === 'subscription_activated') {
       subject = 'Votre abonnement ProofKit est activ\u00e9 !';
