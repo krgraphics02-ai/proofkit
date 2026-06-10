@@ -17,6 +17,15 @@ export default async function handler(req, res) {
     if (!sub) return res.status(404).json({ error: 'Abonnement non trouvé' });
     await stripe.subscriptions.cancel(sub.id);
     await supabase.from('restaurants').update({ subscribed: false }).eq('id', restoId);
+    const { data: resto } = await supabase.from('restaurants').select('*').eq('id', restoId).single();
+    const { data: user } = await supabase.from('users').select('*').eq('restaurant_id', restoId).eq('role', 'manager').single();
+    if (user && resto) {
+      await fetch('https://proofkit.fr/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'subscription_cancelled', email: user.email, name: user.name, restoName: resto.name })
+      });
+    }
     res.status(200).json({ success: true });
   } catch(e) {
     console.error('Cancel error:', e);
