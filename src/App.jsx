@@ -80,7 +80,7 @@ const makeStyles = (dark) => `
   .main { flex: 1; padding: 32px 24px; max-width: 720px; margin: 0 auto; width: 100%; }
   .section-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); font-weight: 700; margin-bottom: 20px; }
   @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-@keyframes ripple { to{transform:scale(1);opacity:0;} }
+@keyframes liquidBubble { 0%{transform:scale(0);opacity:1;} 60%{opacity:0.8;} 100%{transform:scale(1);opacity:0;} }
 
   /* SUPER ADMIN */
   .sa-hero { background: linear-gradient(135deg, rgba(255,171,0,0.08), rgba(0,194,124,0.08)); backdrop-filter: blur(20px); border: 1px solid rgba(255,171,0,0.15); border-radius: 24px; padding: 28px; margin-bottom: 28px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow); }
@@ -325,17 +325,17 @@ useEffect(() => {
 
 useEffect(() => {
   const handleRipple = (e) => {
-    const el = e.target.closest('button, .record-item, .resto-card, .emp-card, .stat-card, .sa-stat, label');
+    const el = e.target.closest('button, .record-item, .resto-card, .emp-card, .stat-card, .sa-stat, label, .tab, .filter-btn');
     if (!el) return;
-    const ripple = document.createElement('span');
+    const bubble = document.createElement('span');
     const rect = el.getBoundingClientRect();
-    const size = Math.max(rect.width, rect.height) * 2;
-    ripple.style.cssText = `position:absolute;width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px;background:rgba(255,255,255,0.25);border-radius:50%;transform:scale(0);animation:ripple 0.5s ease-out forwards;pointer-events:none;z-index:999;`;
+    const size = Math.max(rect.width, rect.height) * 1.5;
+    bubble.style.cssText = `position:absolute;width:${size}px;height:${size}px;left:${e.clientX - rect.left - size/2}px;top:${e.clientY - rect.top - size/2}px;border-radius:50%;pointer-events:none;z-index:999;background:radial-gradient(circle at 35% 35%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0.05) 40%, transparent 70%);box-shadow:inset 0 0 20px rgba(255,255,255,0.15), 0 0 0 1px rgba(120,220,255,0.3), 0 0 0 2px rgba(200,100,255,0.2), 0 0 0 3px rgba(100,255,200,0.15);backdrop-filter:blur(4px) saturate(180%);-webkit-backdrop-filter:blur(4px) saturate(180%);animation:liquidBubble 0.6s ease-out forwards;`;
     const prev = el.style.position;
     if (!prev || prev === 'static') el.style.position = 'relative';
     el.style.overflow = 'hidden';
-    el.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 500);
+    el.appendChild(bubble);
+    setTimeout(() => bubble.remove(), 600);
   };
   document.addEventListener('click', handleRipple);
   return () => document.removeEventListener('click', handleRipple);
