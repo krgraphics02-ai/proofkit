@@ -544,6 +544,14 @@ useEffect(() => {
   const [newPass, setNewPass] = useState("");
   const totalProofs = data.restaurants.reduce((s, r) => s + r.records.length, 0);
   const activeRestos = data.restaurants.filter(r => r.subscribed).length;
+  const [storageUsed, setStorageUsed] = useState(0);
+  useEffect(() => {
+    supabase.from('records').select('id', { count: 'exact' }).then(({ count }) => {
+      setStorageUsed(count || 0);
+    });
+  }, []);
+  const storageEstimatedMB = Math.round(storageUsed * 0.2);
+  const storagePercent = Math.min(Math.round((storageEstimatedMB / 1024) * 100), 100);
 
   const addResto = () => {
     if (!newName || !newUser || !newPass) return;
@@ -615,6 +623,16 @@ const deleteResto = async (id) => {
             <div className="sa-stat"><div className="sa-stat-num">{data.restaurants.length}</div><div className="sa-stat-label">Restaurants</div></div>
             <div className="sa-stat"><div className="sa-stat-num" style={{ color: "var(--green)" }}>{activeRestos}</div><div className="sa-stat-label">Abonnés actifs</div></div>
             <div className="sa-stat"><div className="sa-stat-num">{totalProofs}</div><div className="sa-stat-label">Preuves totales</div></div>
+          <div className="sa-stat" style={{ gridColumn: "1 / -1" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8, fontSize: 13 }}>
+              <span style={{ color: "var(--text-muted)" }}>Stockage Supabase</span>
+              <span style={{ color: storagePercent > 80 ? "var(--red)" : "var(--orange)", fontWeight: 700 }}>{storageEstimatedMB} MB / 1024 MB</span>
+            </div>
+            <div style={{ height: 8, background: "var(--surface2)", borderRadius: 8, overflow: "hidden" }}>
+              <div style={{ height: "100%", width: `${storagePercent}%`, background: storagePercent > 80 ? "var(--red)" : storagePercent > 50 ? "var(--yellow)" : "var(--orange)", borderRadius: 8, transition: "width 0.6s ease" }} />
+            </div>
+            <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 6, textAlign: "right" }}>{storagePercent}% utilisé</div>
+          </div>
           </div>
           <div className="section-title">Tous les restaurants</div>
           <div className="resto-list">
