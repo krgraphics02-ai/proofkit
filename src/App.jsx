@@ -81,6 +81,7 @@ const makeStyles = (dark) => `
   .main { flex: 1; padding: 32px 24px; max-width: 720px; margin: 0 auto; width: 100%; }
   .section-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--orange); font-weight: 700; margin-bottom: 20px; }
   @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes loginFadeIn { from{opacity:0;transform:scale(1.02)} to{opacity:1;transform:scale(1)} }
 @keyframes liquidBubble { 0%{transform:scale(0);opacity:1;} 60%{opacity:0.8;} 100%{transform:scale(1);opacity:0;} }
 
   /* SUPER ADMIN */
@@ -299,6 +300,8 @@ export default function ProofKit() {
 }); // { type: "superadmin" } | { type: "resto", restoId, user }
   const [dark, setDark] = useState(true);
   const [entered, setEntered] = useState(false);
+  const [transitioning, setTransitioning] = useState(false);
+  const enterApp = () => { setTransitioning(true); setTimeout(() => { setEntered(true); setTransitioning(false); }, 450); };
 
 useEffect(() => {
   if (session) localStorage.setItem('proofkit_session', JSON.stringify(session));
@@ -342,8 +345,16 @@ useEffect(() => {
   document.addEventListener('click', handleRipple);
   return () => document.removeEventListener('click', handleRipple);
 }, []);
-  if (!session && !entered) return <Landing onEnter={() => setEntered(true)} />;
-  if (!session) return <LoginScreen data={data} setData={setData} onLogin={setSession} dark={dark} setDark={setDark} onBack={() => setEntered(false)} />;
+  if (!session && !entered) return (
+    <div style={{ opacity: transitioning ? 0 : 1, transform: transitioning ? "scale(0.98)" : "scale(1)", transition: "opacity 0.45s ease, transform 0.45s ease" }}>
+      <Landing onEnter={enterApp} />
+    </div>
+  );
+  if (!session) return (
+    <div style={{ animation: "loginFadeIn 0.5s ease" }}>
+      <LoginScreen data={data} setData={setData} onLogin={setSession} dark={dark} setDark={setDark} onBack={() => setEntered(false)} />
+    </div>
+  );
   if (session.type === "superadmin") return (
     <SuperAdminPanel data={data} setData={setData} onLogout={() => setSession(null)} dark={dark} setDark={setDark} />
   );
