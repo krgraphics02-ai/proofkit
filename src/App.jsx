@@ -343,7 +343,7 @@ useEffect(() => {
   return () => document.removeEventListener('click', handleRipple);
 }, []);
   if (!session && !entered) return <Landing onEnter={() => setEntered(true)} />;
-  if (!session) return <LoginScreen data={data} setData={setData} onLogin={setSession} dark={dark} setDark={setDark} />;
+  if (!session) return <LoginScreen data={data} setData={setData} onLogin={setSession} dark={dark} setDark={setDark} onBack={() => setEntered(false)} />;
   if (session.type === "superadmin") return (
     <SuperAdminPanel data={data} setData={setData} onLogout={() => setSession(null)} dark={dark} setDark={setDark} />
   );
@@ -371,7 +371,7 @@ if (!resto && session?.restoId) {
 }
 
 /* ─── LOGIN ─── */
-function LoginScreen({ data, setData, onLogin, dark, setDark }) {
+function LoginScreen({ data, setData, onLogin, dark, setDark, onBack }) {
   const [mode, setMode] = useState("login"); // "login" | "register"
 
   return (
@@ -380,6 +380,7 @@ function LoginScreen({ data, setData, onLogin, dark, setDark }) {
       <div className="login-wrap">
         <div className="login-box" style={{ maxWidth: 440 }}>
           <div className="login-logo">
+            {onBack && <button onClick={onBack} style={{ background: "none", border: "none", color: "var(--text-muted)", fontSize: 20, cursor: "pointer", padding: 0, marginRight: 4 }}>←</button>}
             <img src="/logo.png" style={{ width: 40, height: 40, borderRadius: 10, objectFit: "contain", background: "#fff" }} />
             <div className="login-brand">Proof<span>Kit</span></div>
             <button className="theme-btn" style={{ marginLeft: "auto" }} onClick={() => setDark(d => !d)}>{dark ? "☀️" : "🌙"}</button>
