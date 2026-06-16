@@ -302,6 +302,7 @@ export default function ProofKit() {
   const [entered, setEntered] = useState(false);
   const [transitioning, setTransitioning] = useState(false);
   const enterApp = () => { setTransitioning(true); setTimeout(() => { setEntered(true); setTransitioning(false); }, 450); };
+  const backToLanding = () => { setTransitioning(true); setTimeout(() => { setEntered(false); setTransitioning(false); }, 400); };
 
 useEffect(() => {
   if (session) localStorage.setItem('proofkit_session', JSON.stringify(session));
@@ -351,8 +352,8 @@ useEffect(() => {
     </div>
   );
   if (!session) return (
-    <div style={{ animation: "loginFadeIn 0.5s ease" }}>
-      <LoginScreen data={data} setData={setData} onLogin={setSession} dark={dark} setDark={setDark} onBack={() => setEntered(false)} />
+    <div style={{ opacity: transitioning ? 0 : 1, transform: transitioning ? "scale(1.02)" : "scale(1)", transition: "opacity 0.4s ease, transform 0.4s ease", animation: transitioning ? "none" : "loginFadeIn 0.5s ease" }}>
+      <LoginScreen data={data} setData={setData} onLogin={setSession} dark={dark} setDark={setDark} onBack={backToLanding} />
     </div>
   );
   if (session.type === "superadmin") return (
