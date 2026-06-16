@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from './supabase.js';
 import piexif from 'piexifjs';
+import Landing from './Landing.jsx';
 
 /* ─── STYLES ─── */
 const makeStyles = (dark) => `
@@ -297,6 +298,7 @@ export default function ProofKit() {
   } catch { return null; }
 }); // { type: "superadmin" } | { type: "resto", restoId, user }
   const [dark, setDark] = useState(true);
+  const [entered, setEntered] = useState(false);
 
 useEffect(() => {
   if (session) localStorage.setItem('proofkit_session', JSON.stringify(session));
@@ -340,6 +342,7 @@ useEffect(() => {
   document.addEventListener('click', handleRipple);
   return () => document.removeEventListener('click', handleRipple);
 }, []);
+  if (!session && !entered) return <Landing onEnter={() => setEntered(true)} />;
   if (!session) return <LoginScreen data={data} setData={setData} onLogin={setSession} dark={dark} setDark={setDark} />;
   if (session.type === "superadmin") return (
     <SuperAdminPanel data={data} setData={setData} onLogout={() => setSession(null)} dark={dark} setDark={setDark} />
