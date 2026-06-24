@@ -15,7 +15,15 @@ export default async function handler(req, res) {
         const pad = n => String(n).padStart(2, '0');
         const local = new Date(dateObj.getTime() + 2 * 60 * 60000);
         const exifDate = `${local.getUTCFullYear()}:${pad(local.getUTCMonth()+1)}:${pad(local.getUTCDate())} ${pad(local.getUTCHours())}:${pad(local.getUTCMinutes())}:${pad(local.getUTCSeconds())}`;
-        const exifObj = { "0th": {}, "Exif": {} };
+
+        // Lire l'EXIF original pour préserver l'orientation
+        let exifObj = { "0th": {}, "Exif": {} };
+        try {
+          const original = piexif.load(b64jpeg);
+          const orientation = original["0th"][piexif.ImageIFD.Orientation];
+          if (orientation) exifObj["0th"][piexif.ImageIFD.Orientation] = orientation;
+        } catch(e) {}
+
         exifObj["0th"][piexif.ImageIFD.DateTime] = exifDate;
         exifObj["Exif"][piexif.ExifIFD.DateTimeOriginal] = exifDate;
         exifObj["Exif"][piexif.ExifIFD.DateTimeDigitized] = exifDate;
