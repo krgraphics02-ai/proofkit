@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "fr.proofkit.app",
+    "sha256_cert_fingerprints": ["09:0E:F3:55:08:3D:38:4D:41:81:55:73:A0:F0:B2:2F:40:08:5F:19:E6:AA:62:77:73:A4:A9:B8:11:C7:1F:21"]
+  }
+}]
