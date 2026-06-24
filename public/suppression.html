@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supprimer mon compte — ProofKit</title>
+  <meta name="description" content="Comment supprimer votre compte ProofKit et les données associées." />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inconsolata:wght@400;500&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #07090f; color: rgba(255,255,255,0.86); font-family: 'Syne', sans-serif; line-height: 1.7; padding: 0 0 80px; -webkit-font-smoothing: antialiased; }
+    .wrap { max-width: 680px; margin: 0 auto; padding: 0 22px; }
+    header { border-bottom: 1px solid rgba(255,255,255,0.08); padding: 22px 0; margin-bottom: 48px; background: rgba(7,9,15,0.8); backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; }
+    .logo img { width: 28px; height: 28px; border-radius: 8px; object-fit: contain; background: #fff; }
+    .logo b { color: #00C27C; }
+    h1 { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 12px; }
+    .lead { color: rgba(255,255,255,0.6); margin-bottom: 40px; font-size: 1.05rem; }
+    h2 { font-size: 1.2rem; font-weight: 700; margin: 36px 0 14px; color: #fff; }
+    h2 .n { font-family: 'Inconsolata', monospace; color: #00C27C; font-size: 0.9rem; margin-right: 10px; }
+    p { margin-bottom: 14px; color: rgba(255,255,255,0.72); }
+    ol { margin: 0 0 16px 0; padding-left: 4px; list-style: none; counter-reset: step; }
+    ol li { color: rgba(255,255,255,0.78); margin-bottom: 12px; padding-left: 40px; position: relative; counter-increment: step; }
+    ol li::before { content: counter(step); position: absolute; left: 0; top: 0; width: 26px; height: 26px; background: rgba(0,194,124,0.15); border: 1px solid rgba(0,194,124,0.3); color: #00e676; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Inconsolata', monospace; font-size: 13px; font-weight: 500; }
+    a { color: #00e676; text-decoration: none; border-bottom: 1px solid rgba(0,230,118,0.3); }
+    a:hover { border-color: #00e676; }
+    strong { color: rgba(255,255,255,0.92); font-weight: 700; }
+    .box { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 22px; margin: 20px 0; }
+    .box p:last-child { margin-bottom: 0; }
+    .warn { border-color: rgba(255,59,92,0.25); background: rgba(255,59,92,0.06); }
+    footer { border-top: 1px solid rgba(255,255,255,0.08); margin-top: 56px; padding-top: 28px; font-family: 'Inconsolata', monospace; font-size: 13px; color: rgba(255,255,255,0.4); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <div class="logo"><img src="/logo.png" alt="ProofKit" />Proof<b>Kit</b></div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <h1>Supprimer mon compte</h1>
+    <p class="lead">Vous pouvez supprimer votre compte ProofKit et toutes les données associées à tout moment, directement depuis l'application ou par e-mail.</p>
+
+    <h2><span class="n">01</span>Depuis l'application</h2>
+    <ol>
+      <li>Connectez-vous à votre espace sur <a href="https://proofkit.fr">proofkit.fr</a></li>
+      <li>Ouvrez l'onglet <strong>Abonnement</strong></li>
+      <li>En bas de la page, dans « Zone de danger », appuyez sur <strong>Supprimer mon compte et toutes mes données</strong></li>
+      <li>Confirmez la suppression</li>
+    </ol>
+
+    <h2><span class="n">02</span>Par e-mail</h2>
+    <p>Vous pouvez aussi nous envoyer une demande de suppression à <a href="mailto:contact@proofkit.fr">contact@proofkit.fr</a> depuis l'adresse e-mail de votre compte. Nous traiterons votre demande dans les meilleurs délais.</p>
+
+    <h2><span class="n">03</span>Données supprimées</h2>
+    <div class="box warn">
+      <p>La suppression de votre compte entraîne l'effacement définitif de :</p>
+      <p>— Votre compte et celui de vos employés<br>
+      — Toutes vos photos et preuves de commande<br>
+      — Vos numéros de commande et données d'anomalie<br>
+      — Vos informations de restaurant</p>
+      <p>Votre abonnement est également annulé : aucun nouveau prélèvement ne sera effectué.</p>
+    </div>
+    <p>Certaines informations strictement nécessaires au respect de nos obligations légales (par exemple les justificatifs comptables de facturation) peuvent être conservées pour la durée imposée par la loi, puis supprimées.</p>
+
+    <p>Pour en savoir plus sur le traitement de vos données, consultez notre <a href="/confidentialite.html">politique de confidentialité</a>.</p>
+
+    <footer>
+      © 2026 ProofKit — beBrand · proofkit.fr
+    </footer>
+  </main>
+</body>
+</html>
