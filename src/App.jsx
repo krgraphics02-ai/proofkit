@@ -1300,6 +1300,28 @@ function SubscriptionView({ subscribed, setSubscribed, setActiveTab, user, resto
           </div>
         </>
       )}
+      <div style={{ marginTop: 40, paddingTop: 24, borderTop: "1px solid var(--border)" }}>
+        <div style={{ fontSize: 11, letterSpacing: 2, textTransform: "uppercase", color: "var(--text-muted)", marginBottom: 12 }}>Zone de danger</div>
+        <button className="modal-del-btn" style={{ marginTop: 0 }} onClick={async () => {
+          if (!confirm("⚠️ Supprimer définitivement votre compte ?\n\nToutes vos preuves, photos et données seront effacées. Votre abonnement sera annulé. Cette action est irréversible.")) return;
+          if (!confirm("Êtes-vous vraiment sûr ? Cette action ne peut pas être annulée.")) return;
+          const res = await fetch('/api/delete-account', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ restoId })
+          });
+          if (res.ok) {
+            alert("Votre compte a été supprimé. Au revoir.");
+            localStorage.removeItem('proofkit_session');
+            window.location.reload();
+          } else {
+            alert("Erreur lors de la suppression. Contactez contact@proofkit.fr");
+          }
+        }}>🗑 Supprimer mon compte et toutes mes données</button>
+        <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 10, lineHeight: 1.5 }}>
+          Vous pouvez aussi demander la suppression par e-mail à contact@proofkit.fr
+        </div>
+      </div>
     </div>
   );
 }
