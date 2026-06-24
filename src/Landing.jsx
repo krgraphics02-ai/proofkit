@@ -199,6 +199,9 @@ const styles = `
   .pk-footer .pk-logo { justify-content: center; margin-bottom: 10px; font-size: 16px; }
   .pk-footer p { font-size: 0.9rem; color: var(--muted); margin-bottom: 14px; }
   .pk-footer small { font-family: 'Inconsolata', monospace; font-size: 12px; letter-spacing: 0.04em; }
+  .pk-footer-links { display: flex; gap: 22px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; }
+  .pk-footer-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color .2s; }
+  .pk-footer-links a:hover { color: var(--green-bright); }
 
   /* SCROLL REVEAL */
   .pk-reveal { opacity: 0; transform: translateY(26px); transition: opacity .7s cubic-bezier(.2,.6,.2,1), transform .7s cubic-bezier(.2,.6,.2,1); }
@@ -454,7 +457,12 @@ export default function Landing({ onEnter }) {
       <footer className="pk-footer">
         <div className="pk-logo"><img src="/logo.png" alt="ProofKit" />Proof<b>Kit</b></div>
         <p>Preuves horodatées pour la livraison.</p>
-        <small>© 2026 ProofKit · proofkit.fr</small>
+        <div className="pk-footer-links">
+          <a href="/confidentialite.html">Confidentialité</a>
+          <a href="/suppression.html">Supprimer mon compte</a>
+          <a href="mailto:contact@proofkit.fr">Contact</a>
+        </div>
+        <small>© 2026 ProofKit · beBrand · proofkit.fr</small>
       </footer>
     </div>
   );
