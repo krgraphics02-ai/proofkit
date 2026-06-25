@@ -3,6 +3,9 @@
   "target": {
     "namespace": "android_app",
     "package_name": "fr.proofkit.app",
-    "sha256_cert_fingerprints": ["09:0E:F3:55:08:3D:38:4D:41:81:55:73:A0:F0:B2:2F:40:08:5F:19:E6:AA:62:77:73:A4:A9:B8:11:C7:1F:21"]
+    "sha256_cert_fingerprints": [
+      "09:0E:F3:55:08:3D:38:4D:41:81:55:73:A0:F0:B2:2F:40:08:5F:19:E6:AA:62:77:73:A4:A9:B8:11:C7:1F:21",
+      "33:3F:F2:D9:E4:DC:3C:D2:57:35:52:FB:D6:79:E9:6C:B0:9D:55:F5:C3:C5:C6:3F:D0:6D:6D:97:D2:09:3A:EA"
+    ]
   }
 }]
