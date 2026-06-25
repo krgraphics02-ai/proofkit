@@ -822,12 +822,13 @@ const handleFile = (file) => {
     r.onload = e => setImgSrc2(e.target.result);
     r.readAsDataURL(file);
   };
-const uploadToSupabase = async (file, timestamp) => {
-  const ext = file.type.includes('png') ? 'png' : 'jpg';
+const uploadToSupabase = async (file) => {
+  const contentType = file.type || 'image/jpeg';
+  const ext = contentType.includes('png') ? 'png' : 'jpg';
   const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const { data, error } = await supabase.storage
+  const { error } = await supabase.storage
     .from('proofs')
-    .upload(fileName, file, { contentType: file.type });
+    .upload(fileName, file, { contentType });
   if (error) return null;
   const { data: urlData } = supabase.storage.from('proofs').getPublicUrl(fileName);
   return urlData.publicUrl;
@@ -881,7 +882,7 @@ const compressed = await compressImage(imgFile);
 const b64 = await toBase64(compressed);
 let uploadedUrl = null;
 try {
-  uploadedUrl = await uploadToSupabase(imgFile, timestamp);
+  uploadedUrl = await uploadToSupabase(compressed);
 } catch(e) {
   console.error("Upload error:", e);
 }
@@ -920,7 +921,7 @@ Si tu vois un code alphanumérique 5 caractères, c'est FORCÉMENT le numéro de
       const text = data.content?.map(b => b.text || "").join("") || "{}";
       const parsed = JSON.parse(text.replace(/```json/g, "").replace(/```/g, "").trim());
       const fixedImg = fixExifDate(imgSrc, timestamp);
-record = { ...parsed, timestamp, imgSrc: uploadedUrl || fixedImg };
+record = { ...parsed, timestamp, imgSrc: fixedImg, _uploadedUrl: uploadedUrl };
     } catch(e) {
       record = { order_number: null, status: "warning", anomaly: "Erreur: " + e.message, items_detected: null, confidence: "low", timestamp, imgSrc };
     }
@@ -934,7 +935,7 @@ await supabase.from('records').insert([{
   anomaly: record.anomaly,
   items_detected: record.items_detected,
   confidence: record.confidence,
-  img_src: record.imgSrc,
+  img_src: record._uploadedUrl || record.imgSrc,
   img_src_2: imgSrc2Url,
   timestamp: record.timestamp
 }]);
@@ -1040,7 +1041,7 @@ const deleteRecord = async (id) => {
         <div className="records-list">
           {filtered.map(r => (
             <div key={r.id} className={`record-item ${r.status !== "ok" ? "has-alert" : ""}`} onClick={() => setSelected(r)}>
-              <img src={r.imgSrc} alt="" className="record-thumb" />
+              <img src={r.imgSrc} alt="" className="record-thumb" onError={e => { if (!e.target.dataset.retried && !String(e.target.src).startsWith('data:')) { e.target.dataset.retried = '1'; const s = e.target.src.split('?')[0]; setTimeout(() => { e.target.src = s + '?r=1'; }, 2500); } }} />
               <div className="record-info">
                 <div className="record-order">{r.order_number || "# Non détecté"}</div>
                 <div className="record-meta">
@@ -1060,8 +1061,8 @@ const deleteRecord = async (id) => {
               <div><div className="order-num-label">Commande</div><div className="order-num">{selected.order_number || "Non détecté"}</div></div>
               <button className="modal-close" onClick={() => setSelected(null)}>×</button>
             </div>
-            <img src={selected.imgSrc} alt="preuve" className="modal-img" />
-{selected.img_src_2 && <img src={selected.img_src_2} alt="preuve 2" className="modal-img" style={{ borderTop: "1px solid var(--border)" }} />}
+            <img src={selected.imgSrc} alt="preuve" className="modal-img" onError={e => { if (!e.target.dataset.retried && !String(e.target.src).startsWith('data:')) { e.target.dataset.retried = '1'; const s = e.target.src.split('?')[0]; setTimeout(() => { e.target.src = s + '?r=1'; }, 2500); } }} />
+{selected.img_src_2 && <img src={selected.img_src_2} alt="preuve 2" className="modal-img" style={{ borderTop: "1px solid var(--border)" }} onError={e => { if (!e.target.dataset.retried && !String(e.target.src).startsWith('data:')) { e.target.dataset.retried = '1'; const s = e.target.src.split('?')[0]; setTimeout(() => { e.target.src = s + '?r=1'; }, 2500); } }} />}
             <div className="modal-body">
               <div className="result-row"><span className="result-row-label">Statut</span><span className={`status-badge ${statusInfo(selected.status).cls}`}>{statusInfo(selected.status).label}</span></div>
               <div className="result-row"><span className="result-row-label">Horodatage</span><span className="timestamp">{fmtDate(selected.timestamp)}</span></div>
