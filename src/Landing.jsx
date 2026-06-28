@@ -222,9 +222,9 @@ const styles = `
     .pk-wrap { padding: 0 16px; }
     .pk-price-card { padding: 30px 20px; }
 
-    /* Fix débordement horizontal */
-    .pk-h1 { font-size: clamp(1.75rem, 8.5vw, 2.4rem); }
-    .pk-h1 .strike { white-space: normal; }
+    /* Fix débordement horizontal — taille réduite pour tenir en nowrap */
+    .pk-h1 { font-size: clamp(1.35rem, 7.2vw, 2rem); }
+    .pk-h1 .strike { white-space: nowrap; }
     .pk-ev-time { font-size: 13px; letter-spacing: 0; }
     .pk-ev-exif { font-size: 10px; overflow-wrap: break-word; word-break: break-all; }
     .pk-ev-code { font-size: 22px; }
