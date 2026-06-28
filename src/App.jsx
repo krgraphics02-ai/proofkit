@@ -269,8 +269,8 @@ const makeStyles = (dark) => `
   }
 
   /* PWA INSTALL BANNER */
-  @keyframes pwaSlideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
-  .pwa-banner { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 500; width: calc(100% - 32px); max-width: 420px; background: ${dark ? "rgba(10,15,26,0.92)" : "rgba(255,255,255,0.92)"}; backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%); border: 1px solid rgba(0,194,124,0.35); border-radius: 22px; padding: 20px; box-shadow: 0 8px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,194,124,0.12), 0 0 40px rgba(0,194,124,0.12); animation: pwaSlideUp 0.4s cubic-bezier(0.16,1,0.3,1); }
+  @keyframes pwaSlideUp { from{opacity:0;transform:translateX(-50%) translateY(24px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+  .pwa-banner { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 9999; width: calc(100% - 32px); max-width: 420px; background: ${dark ? "rgba(10,15,26,0.96)" : "rgba(255,255,255,0.96)"}; backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%); border: 1px solid rgba(0,194,124,0.35); border-radius: 22px; padding: 20px; box-shadow: 0 8px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,194,124,0.12), 0 0 40px rgba(0,194,124,0.12); animation: pwaSlideUp 0.4s cubic-bezier(0.16,1,0.3,1) 4s both; }
   .pwa-banner-top { display: flex; align-items: flex-start; gap: 14px; }
   .pwa-banner-icon { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #00C27C, #00a366); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; box-shadow: 0 4px 16px rgba(0,194,124,0.4); }
   .pwa-banner-text { flex: 1; }
@@ -287,71 +287,41 @@ const makeStyles = (dark) => `
 
 /* ─── PWA INSTALL BANNER ─── */
 function PWAInstallBanner() {
-  const [visible, setVisible] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [platform, setPlatform] = useState(null);
 
   useEffect(() => {
-    const isStandalone =
-      window.navigator.standalone === true ||
-      window.matchMedia('(display-mode: standalone)').matches;
-    if (isStandalone) return;
-
-    localStorage.removeItem('proofkit_pwa_dismissed'); // TEMP: force affichage pour test
-
-    const ua = navigator.userAgent.toLowerCase();
-    const isIOS = /iphone|ipad|ipod/.test(ua) && !window.MSStream;
-    const isSafari = isIOS && /safari/.test(ua) && !/crios|fxios/.test(ua);
-    const isChromium = /chrome|chromium|crios/.test(ua) && !/edg\//.test(ua) || /edg\//.test(ua);
-
-    // iOS Safari → instructions manuelles
-    if (isIOS && isSafari) {
-      setPlatform('ios');
-      setTimeout(() => setVisible(true), 4000);
-      return;
-    }
-
-    // Chromium (Chrome, Edge, Samsung…) → bouton natif si dispo, sinon hint
-    if (isChromium || (!isIOS && !/firefox/.test(ua))) {
-      const prompt = window.__pwaPrompt;
-      if (prompt) setDeferredPrompt(prompt);
-      setPlatform('chromium');
-      setTimeout(() => setVisible(true), 4000);
-
-      // Écoute aussi au cas où l'événement arrive plus tard
-      const handler = (e) => {
-        e.preventDefault();
-        window.__pwaPrompt = e;
-        setDeferredPrompt(e);
-      };
-      window.addEventListener('beforeinstallprompt', handler);
-      return () => window.removeEventListener('beforeinstallprompt', handler);
-    }
+    if (window.__pwaPrompt) setDeferredPrompt(window.__pwaPrompt);
+    const handler = (e) => { e.preventDefault(); window.__pwaPrompt = e; setDeferredPrompt(e); };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
   const dismiss = () => {
     localStorage.setItem('proofkit_pwa_dismissed', String(Date.now()));
-    setVisible(false);
+    document.getElementById('pwa-banner-el')?.remove();
   };
 
   const handleInstall = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
       const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        localStorage.setItem('proofkit_pwa_dismissed', String(Date.now()));
-        setVisible(false);
-        return;
-      }
-      setDeferredPrompt(null);
+      if (outcome === 'accepted') localStorage.setItem('proofkit_pwa_dismissed', String(Date.now()));
     }
-    setVisible(false);
+    document.getElementById('pwa-banner-el')?.remove();
   };
 
-  if (!visible || !platform) return null;
+  const ua = navigator.userAgent.toLowerCase();
+  const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+  const dismissed = localStorage.getItem('proofkit_pwa_dismissed');
+  const recentlyDismissed = dismissed && Date.now() - Number(dismissed) < 7 * 24 * 60 * 60 * 1000;
+  const isIOS = /iphone|ipad|ipod/.test(ua) && !window.MSStream;
+  const isIOSSafari = isIOS && /safari/.test(ua) && !/crios|fxios/.test(ua);
+  const isFirefox = /firefox/.test(ua);
+
+  if (isStandalone || recentlyDismissed || isFirefox) return null;
 
   return (
-    <div className="pwa-banner">
+    <div id="pwa-banner-el" className="pwa-banner">
       <div className="pwa-banner-top">
         <div className="pwa-banner-icon">📲</div>
         <div className="pwa-banner-text">
@@ -360,21 +330,21 @@ function PWAInstallBanner() {
         </div>
         <button className="pwa-banner-close" onClick={dismiss}>✕</button>
       </div>
-      {platform === 'chromium' && deferredPrompt && (
+      {deferredPrompt && (
         <button className="pwa-install-btn" onClick={handleInstall}>
           Installer l'application →
         </button>
       )}
-      {platform === 'chromium' && !deferredPrompt && (
-        <div className="pwa-ios-steps">
-          <div className="pwa-ios-step"><span className="pwa-ios-step-num">1</span>Cliquez sur l'icône <strong style={{color:"var(--orange)",margin:"0 4px"}}>Installer</strong> ⊕ dans la barre d'adresse</div>
-          <div className="pwa-ios-step"><span className="pwa-ios-step-num">2</span>Ou Menu → <strong style={{color:"var(--orange)",margin:"0 4px"}}>Enregistrer et partager → Installer comme application</strong></div>
-        </div>
-      )}
-      {platform === 'ios' && (
+      {!deferredPrompt && isIOSSafari && (
         <div className="pwa-ios-steps">
           <div className="pwa-ios-step"><span className="pwa-ios-step-num">1</span>Appuyez sur le bouton <strong style={{color:"var(--orange)",margin:"0 4px"}}>Partager</strong> ⎋ en bas de Safari</div>
           <div className="pwa-ios-step"><span className="pwa-ios-step-num">2</span>Faites défiler et appuyez sur <strong style={{color:"var(--orange)",margin:"0 4px"}}>Sur l'écran d'accueil</strong> ＋</div>
+        </div>
+      )}
+      {!deferredPrompt && !isIOSSafari && (
+        <div className="pwa-ios-steps">
+          <div className="pwa-ios-step"><span className="pwa-ios-step-num">1</span>Cliquez sur l'icône <strong style={{color:"var(--orange)",margin:"0 4px"}}>Installer</strong> ⊕ dans la barre d'adresse Chrome</div>
+          <div className="pwa-ios-step"><span className="pwa-ios-step-num">2</span>Ou Menu ⋮ → <strong style={{color:"var(--orange)",margin:"0 4px"}}>Enregistrer et partager → Installer</strong></div>
         </div>
       )}
     </div>
