@@ -316,6 +316,7 @@ function PWAInstallBanner() {
   const recentlyDismissed = dismissed && Date.now() - Number(dismissed) < 7 * 24 * 60 * 60 * 1000;
   const isIOS = /iphone|ipad|ipod/.test(ua) && !window.MSStream;
   const isIOSSafari = isIOS && /safari/.test(ua) && !/crios|fxios/.test(ua);
+  const isMacSafari = !isIOS && /safari/.test(ua) && !/chrome|chromium|crios/.test(ua) && /macintosh/.test(ua);
   const isFirefox = /firefox/.test(ua);
 
   if (isStandalone || recentlyDismissed || isFirefox) return null;
@@ -341,9 +342,15 @@ function PWAInstallBanner() {
           <div className="pwa-ios-step"><span className="pwa-ios-step-num">2</span>Faites défiler et appuyez sur <strong style={{color:"var(--orange)",margin:"0 4px"}}>Sur l'écran d'accueil</strong> ＋</div>
         </div>
       )}
-      {!deferredPrompt && !isIOSSafari && (
+      {!deferredPrompt && isMacSafari && (
         <div className="pwa-ios-steps">
-          <div className="pwa-ios-step"><span className="pwa-ios-step-num">1</span>Cliquez sur l'icône <strong style={{color:"var(--orange)",margin:"0 4px"}}>Installer</strong> ⊕ dans la barre d'adresse Chrome</div>
+          <div className="pwa-ios-step"><span className="pwa-ios-step-num">1</span>Dans la barre de menus Safari, cliquez sur <strong style={{color:"var(--orange)",margin:"0 4px"}}>Fichier</strong></div>
+          <div className="pwa-ios-step"><span className="pwa-ios-step-num">2</span>Sélectionnez <strong style={{color:"var(--orange)",margin:"0 4px"}}>Ajouter au Dock…</strong></div>
+        </div>
+      )}
+      {!deferredPrompt && !isIOSSafari && !isMacSafari && (
+        <div className="pwa-ios-steps">
+          <div className="pwa-ios-step"><span className="pwa-ios-step-num">1</span>Cliquez sur l'icône <strong style={{color:"var(--orange)",margin:"0 4px"}}>Installer</strong> ⊕ dans la barre d'adresse</div>
           <div className="pwa-ios-step"><span className="pwa-ios-step-num">2</span>Ou Menu ⋮ → <strong style={{color:"var(--orange)",margin:"0 4px"}}>Enregistrer et partager → Installer</strong></div>
         </div>
       )}
