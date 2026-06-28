@@ -314,8 +314,16 @@ function PWAInstallBanner() {
       return;
     }
 
+    // L'événement peut avoir été capturé avant le montage du composant (login tardif)
+    if (window.__pwaPrompt) {
+      setDeferredPrompt(window.__pwaPrompt);
+      showAfterDelay('android');
+      return;
+    }
+
     const handler = (e) => {
       e.preventDefault();
+      window.__pwaPrompt = e;
       setDeferredPrompt(e);
       showAfterDelay('android');
     };
