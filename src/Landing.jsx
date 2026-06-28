@@ -9,6 +9,7 @@ import { useState, useEffect, useRef } from "react";
 const styles = `
   @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inconsolata:wght@300;400;500;600&display=swap');
 
+  html, body { overflow-x: hidden; max-width: 100%; }
   .pk-landing *, .pk-landing *::before, .pk-landing *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   .pk-landing {
@@ -218,8 +219,16 @@ const styles = `
   @media (max-width: 600px) {
     .pk-headnav .pk-ghost { display: none; }
     .pk-steps-grid, .pk-feat-grid { grid-template-columns: 1fr; }
-    .pk-wrap { padding: 0 18px; }
-    .pk-price-card { padding: 30px 24px; }
+    .pk-wrap { padding: 0 16px; }
+    .pk-price-card { padding: 30px 20px; }
+
+    /* Fix débordement horizontal */
+    .pk-h1 { font-size: clamp(1.75rem, 8.5vw, 2.4rem); }
+    .pk-h1 .strike { white-space: normal; }
+    .pk-ev-time { font-size: 13px; letter-spacing: 0; }
+    .pk-ev-exif { font-size: 10px; overflow-wrap: break-word; word-break: break-all; }
+    .pk-ev-code { font-size: 22px; }
+    .pk-evidence { max-width: 100%; }
   }
 
   @media (prefers-reduced-motion: reduce) {
