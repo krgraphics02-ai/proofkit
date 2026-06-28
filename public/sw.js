@@ -11,8 +11,16 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // Laisser passer au réseau sans respondWith : non-GET et requêtes API
   if (e.request.method !== 'GET') return;
+  if (new URL(e.request.url).pathname.startsWith('/api/')) return;
+
   e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).catch(
+        () => new Response('Offline', { status: 503, statusText: 'Service Unavailable' })
+      );
+    })
   );
 });
