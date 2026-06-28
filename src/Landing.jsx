@@ -303,13 +303,12 @@ export default function Landing({ onEnter }) {
         {/* HERO */}
         <section className="pk-hero">
           <div>
-            <div className="pk-hero-eyebrow pk-eyebrow"><span className="pk-dot" />PREUVES HORODATÉES · LIVRAISON</div>
+            <div className="pk-hero-eyebrow pk-eyebrow"><span className="pk-dot" />PHOTO · LECTURE AUTO · ARCHIVAGE · RECHERCHE</div>
             <h1 className="pk-h1">
               Le <span className="strike">remboursement abusif</span><br />s'arrête <span className="ok">ici</span>.
             </h1>
             <p className="pk-sub">
-              ProofKit horodate chaque commande au moment où elle quitte votre cuisine.
-              Une preuve infalsifiable, prête à contester n'importe quelle réclamation Uber Eats ou Deliveroo.
+              Vos employés photographient chaque commande directement depuis l'app. ProofKit lit le numéro de commande, l'horodate automatiquement et l'archive dans une base centralisée. Chaque preuve se retrouve en deux secondes, prête à contester la moindre réclamation Uber Eats ou Deliveroo.
             </p>
             <div className="pk-cta-row">
               <button className="pk-cta" onClick={go}>Créer mon espace gratuit</button>
