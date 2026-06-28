@@ -297,8 +297,7 @@ function PWAInstallBanner() {
       window.matchMedia('(display-mode: standalone)').matches;
     if (isStandalone) return;
 
-    const dismissed = localStorage.getItem('proofkit_pwa_dismissed');
-    if (dismissed && Date.now() - Number(dismissed) < 7 * 24 * 60 * 60 * 1000) return;
+    localStorage.removeItem('proofkit_pwa_dismissed'); // TEMP: force affichage pour test
 
     const ua = navigator.userAgent.toLowerCase();
     const isIOS = /iphone|ipad|ipod/.test(ua) && !window.MSStream;
