@@ -267,7 +267,102 @@ const makeStyles = (dark) => `
     .user-name { display: none; }
     .sub-price { font-size: 36px; }
   }
+
+  /* PWA INSTALL BANNER */
+  @keyframes pwaSlideUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+  .pwa-banner { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 500; width: calc(100% - 32px); max-width: 420px; background: ${dark ? "rgba(10,15,26,0.92)" : "rgba(255,255,255,0.92)"}; backdrop-filter: blur(32px) saturate(200%); -webkit-backdrop-filter: blur(32px) saturate(200%); border: 1px solid rgba(0,194,124,0.35); border-radius: 22px; padding: 20px; box-shadow: 0 8px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(0,194,124,0.12), 0 0 40px rgba(0,194,124,0.12); animation: pwaSlideUp 0.4s cubic-bezier(0.16,1,0.3,1); }
+  .pwa-banner-top { display: flex; align-items: flex-start; gap: 14px; }
+  .pwa-banner-icon { width: 48px; height: 48px; border-radius: 14px; background: linear-gradient(135deg, #00C27C, #00a366); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; box-shadow: 0 4px 16px rgba(0,194,124,0.4); }
+  .pwa-banner-text { flex: 1; }
+  .pwa-banner-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; color: var(--text); line-height: 1.3; }
+  .pwa-banner-sub { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .pwa-banner-close { width: 28px; height: 28px; background: var(--surface2); border: 1px solid var(--border2); border-radius: 8px; color: var(--text-muted); font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s; }
+  .pwa-banner-close:hover { background: var(--red-soft); color: var(--red); border-color: rgba(255,59,92,0.2); }
+  .pwa-install-btn { width: 100%; margin-top: 14px; padding: 12px; background: linear-gradient(135deg, #00C27C, #00a366); border: none; border-radius: 12px; color: #fff; font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 16px rgba(0,194,124,0.4); }
+  .pwa-install-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(0,194,124,0.5); }
+  .pwa-ios-steps { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+  .pwa-ios-step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-muted); background: var(--surface2); border-radius: 10px; padding: 10px 12px; border: 1px solid var(--border2); }
+  .pwa-ios-step-num { width: 22px; height: 22px; background: rgba(0,194,124,0.15); border: 1px solid rgba(0,194,124,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--orange); flex-shrink: 0; }
 `;
+
+/* ─── PWA INSTALL BANNER ─── */
+function PWAInstallBanner() {
+  const [visible, setVisible] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [platform, setPlatform] = useState(null); // "android" | "ios" | null
+
+  useEffect(() => {
+    const isStandalone =
+      window.navigator.standalone === true ||
+      window.matchMedia('(display-mode: standalone)').matches;
+    if (isStandalone) return;
+
+    const dismissed = localStorage.getItem('proofkit_pwa_dismissed');
+    if (dismissed && Date.now() - Number(dismissed) < 7 * 24 * 60 * 60 * 1000) return;
+
+    const ua = navigator.userAgent.toLowerCase();
+    const isIOS = /iphone|ipad|ipod/.test(ua) && !window.MSStream;
+    const isSafari = isIOS && /safari/.test(ua) && !/crios|fxios/.test(ua);
+
+    const showAfterDelay = (plt) => {
+      setPlatform(plt);
+      setTimeout(() => setVisible(true), 4000);
+    };
+
+    if (isIOS && isSafari) {
+      showAfterDelay('ios');
+      return;
+    }
+
+    const handler = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      showAfterDelay('android');
+    };
+    window.addEventListener('beforeinstallprompt', handler);
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const dismiss = (days = 7) => {
+    localStorage.setItem('proofkit_pwa_dismissed', String(Date.now() - (7 - days) * 24 * 60 * 60 * 1000));
+    setVisible(false);
+  };
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') localStorage.setItem('proofkit_pwa_dismissed', String(Date.now()));
+    setDeferredPrompt(null);
+    setVisible(false);
+  };
+
+  if (!visible || !platform) return null;
+
+  return (
+    <div className="pwa-banner">
+      <div className="pwa-banner-top">
+        <div className="pwa-banner-icon">📲</div>
+        <div className="pwa-banner-text">
+          <div className="pwa-banner-title">Et si vous ajoutiez ProofKit à votre écran d'accueil&nbsp;?</div>
+          <div className="pwa-banner-sub">Accès instantané, comme une vraie appli.</div>
+        </div>
+        <button className="pwa-banner-close" onClick={() => dismiss()}>✕</button>
+      </div>
+      {platform === 'android' && (
+        <button className="pwa-install-btn" onClick={handleInstall}>
+          Installer l'application →
+        </button>
+      )}
+      {platform === 'ios' && (
+        <div className="pwa-ios-steps">
+          <div className="pwa-ios-step"><span className="pwa-ios-step-num">1</span>Appuyez sur le bouton <strong style={{color:"var(--orange)",margin:"0 4px"}}>Partager</strong> ⎋ en bas de Safari</div>
+          <div className="pwa-ios-step"><span className="pwa-ios-step-num">2</span>Faites défiler et appuyez sur <strong style={{color:"var(--orange)",margin:"0 4px"}}>Sur l'écran d'accueil</strong> ＋</div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 /* ─── DATA INITIALE ─── */
 const INIT_DATA = {
@@ -778,6 +873,7 @@ subscribed={resto.subscribed} setActiveTab={setActiveTab} />}
             </label>
           </div>
         )}
+        <PWAInstallBanner />
       </div>
     </>
   );
