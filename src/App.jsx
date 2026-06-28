@@ -289,7 +289,7 @@ const makeStyles = (dark) => `
 function PWAInstallBanner() {
   const [visible, setVisible] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-  const [platform, setPlatform] = useState(null); // "android" | "ios" | null
+  const [platform, setPlatform] = useState(null);
 
   useEffect(() => {
     const isStandalone =
@@ -303,45 +303,49 @@ function PWAInstallBanner() {
     const ua = navigator.userAgent.toLowerCase();
     const isIOS = /iphone|ipad|ipod/.test(ua) && !window.MSStream;
     const isSafari = isIOS && /safari/.test(ua) && !/crios|fxios/.test(ua);
+    const isChromium = /chrome|chromium|crios/.test(ua) && !/edg\//.test(ua) || /edg\//.test(ua);
 
-    const showAfterDelay = (plt) => {
-      setPlatform(plt);
-      setTimeout(() => setVisible(true), 4000);
-    };
-
+    // iOS Safari → instructions manuelles
     if (isIOS && isSafari) {
-      showAfterDelay('ios');
+      setPlatform('ios');
+      setTimeout(() => setVisible(true), 4000);
       return;
     }
 
-    // L'événement peut avoir été capturé avant le montage du composant (login tardif)
-    if (window.__pwaPrompt) {
-      setDeferredPrompt(window.__pwaPrompt);
-      showAfterDelay('android');
-      return;
-    }
+    // Chromium (Chrome, Edge, Samsung…) → bouton natif si dispo, sinon hint
+    if (isChromium || (!isIOS && !/firefox/.test(ua))) {
+      const prompt = window.__pwaPrompt;
+      if (prompt) setDeferredPrompt(prompt);
+      setPlatform('chromium');
+      setTimeout(() => setVisible(true), 4000);
 
-    const handler = (e) => {
-      e.preventDefault();
-      window.__pwaPrompt = e;
-      setDeferredPrompt(e);
-      showAfterDelay('android');
-    };
-    window.addEventListener('beforeinstallprompt', handler);
-    return () => window.removeEventListener('beforeinstallprompt', handler);
+      // Écoute aussi au cas où l'événement arrive plus tard
+      const handler = (e) => {
+        e.preventDefault();
+        window.__pwaPrompt = e;
+        setDeferredPrompt(e);
+      };
+      window.addEventListener('beforeinstallprompt', handler);
+      return () => window.removeEventListener('beforeinstallprompt', handler);
+    }
   }, []);
 
-  const dismiss = (days = 7) => {
-    localStorage.setItem('proofkit_pwa_dismissed', String(Date.now() - (7 - days) * 24 * 60 * 60 * 1000));
+  const dismiss = () => {
+    localStorage.setItem('proofkit_pwa_dismissed', String(Date.now()));
     setVisible(false);
   };
 
   const handleInstall = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') localStorage.setItem('proofkit_pwa_dismissed', String(Date.now()));
-    setDeferredPrompt(null);
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        localStorage.setItem('proofkit_pwa_dismissed', String(Date.now()));
+        setVisible(false);
+        return;
+      }
+      setDeferredPrompt(null);
+    }
     setVisible(false);
   };
 
@@ -355,12 +359,18 @@ function PWAInstallBanner() {
           <div className="pwa-banner-title">Et si vous ajoutiez ProofKit à votre écran d'accueil&nbsp;?</div>
           <div className="pwa-banner-sub">Accès instantané, comme une vraie appli.</div>
         </div>
-        <button className="pwa-banner-close" onClick={() => dismiss()}>✕</button>
+        <button className="pwa-banner-close" onClick={dismiss}>✕</button>
       </div>
-      {platform === 'android' && (
+      {platform === 'chromium' && deferredPrompt && (
         <button className="pwa-install-btn" onClick={handleInstall}>
           Installer l'application →
         </button>
+      )}
+      {platform === 'chromium' && !deferredPrompt && (
+        <div className="pwa-ios-steps">
+          <div className="pwa-ios-step"><span className="pwa-ios-step-num">1</span>Cliquez sur l'icône <strong style={{color:"var(--orange)",margin:"0 4px"}}>Installer</strong> ⊕ dans la barre d'adresse</div>
+          <div className="pwa-ios-step"><span className="pwa-ios-step-num">2</span>Ou Menu → <strong style={{color:"var(--orange)",margin:"0 4px"}}>Enregistrer et partager → Installer comme application</strong></div>
+        </div>
       )}
       {platform === 'ios' && (
         <div className="pwa-ios-steps">
