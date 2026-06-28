@@ -1029,7 +1029,7 @@ await supabase.from('records').insert([{
   img_src_2: imgSrc2Url,
   timestamp: record.timestamp
 }]);
-addRecord({ ...record, img_src_2: imgSrc2Url, imgSrc2: imgSrc2Url });
+addRecord({ ...record, imgSrc: record._uploadedUrl || record.imgSrc, img_src_2: imgSrc2Url, imgSrc2: imgSrc2Url });
 if (!subscribed) setDailyCount(prev => prev + 1);
     setLoading(false); setDone(true);
     setTimeout(() => { setActiveTab("Preuves"); setImgSrc(null); setImgFile(null); setDone(false); }, 1200);
